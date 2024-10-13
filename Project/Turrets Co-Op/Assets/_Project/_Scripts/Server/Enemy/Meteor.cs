@@ -1,9 +1,14 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Mirror;
+using NUnit.Framework;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Meteor : NetworkBehaviour {
+
+    bool splitable = true;
     [SerializeField] float meteorSpeed = 3;
     Rigidbody rb;
     [SerializeField] MeshRenderer renderer;
@@ -27,13 +32,46 @@ public class Meteor : NetworkBehaviour {
             _player.TweakHealth (false, 1);
             DestroyWEffect ();
         }
+    }
+
+    [Server]
+    void DestroyWEffect () {
+        DisableObj ();
+        PlayEffectReturn ();
+    }
+
+    [Server]
+    public void Split () {
+
+        if (splitable) {
+            splitable = false;
+            Meteor[] _children = new Meteor[3];
+            DestroyWEffect ();
+        
+            _children = MeteorPoolManager.Instance.GetMeteorsForSplit (Random.Range (2, 3)); //grab 2/3 meteors from pool
+
+            foreach (var child in _children) {
+                if (child != null) {
+                    child.transform.position = transform.position;
+                    float _randomUScale = Random.Range (.5f,.95f);
+                    child.transform.localScale = new Vector3 (_randomUScale, _randomUScale, _randomUScale);
+                    child.transform.Rotate (PickRandomDirection ()); //randomly Rotates Object
+                    child.splitable = false;
+                    child.EnableObj ();
+                }
+            }
+        } else {
+            DestroyWEffect ();
+        }
         
     }
 
     [Server]
-    public void DestroyWEffect () { //TODO: disable play effect then return
-        DisableObj ();
-        PlayEffectReturn ();
+    Vector3 PickRandomDirection () {
+        float _randomX = Random.Range (-60f, 60f);
+        float _randomY = Random.Range (-60f, 60f);
+
+        return new Vector3 (_randomX, _randomY, 0);
     }
 
     [Server]
@@ -62,6 +100,7 @@ public class Meteor : NetworkBehaviour {
 
     [Server]
     void ReturnMe () {
+        splitable = true;
         DisableObj ();
         MeteorPoolManager.Instance.ReturnMeteor (gameObject);
     }

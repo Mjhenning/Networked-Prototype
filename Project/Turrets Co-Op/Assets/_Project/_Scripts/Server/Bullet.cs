@@ -25,7 +25,7 @@ public class Bullet : NetworkBehaviour
         if (hit.transform.GetComponent<Meteor>())
         {
             playerRef.AddScore(10, playerRef); // Add score to player
-            hit.transform.GetComponent<Meteor> ().DestroyWEffect (); //TODO: currently only destroys meteor , split meteor logic should be called here
+            hit.transform.GetComponent<Meteor> ().Split ();
         }
 
         PoolManager.Instance.ReturnBullet(gameObject);

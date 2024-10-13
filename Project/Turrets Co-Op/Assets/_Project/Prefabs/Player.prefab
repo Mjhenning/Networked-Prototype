@@ -58,8 +58,12 @@ MonoBehaviour:
     m_Bits: 8
   isFiring: 0
   playerRenderer: {fileID: 6694318409912153516}
+  playerCol: {fileID: 0}
   fireRate: 1
   lastFireTime: 0
+  isScoring: 0
+  maxHealth: 5
+  currentHealth: 5
   chInstance: {fileID: 311842538161444084}
   scoreInstance: {fileID: 6034434879575807526}
   nonCursor: 0

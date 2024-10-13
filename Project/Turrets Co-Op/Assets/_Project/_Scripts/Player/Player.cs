@@ -211,6 +211,10 @@ public class Player : NetworkBehaviour {
         if (scoreInstance) {
             scoreInstance.SetColor (newColor);
         }
+
+        if (HealthManager.instance) {
+            HealthManager.instance.ChangeColor (newColor);
+        }
     }
 
 
@@ -398,6 +402,7 @@ public class Player : NetworkBehaviour {
                 break;
             case false:
                 newHealth = currentHealth -= value;
+                UI_Manager.instance.UpdateHealth (false);
                 break;
         }
 

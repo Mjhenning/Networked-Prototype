@@ -1,95 +1,87 @@
 using System;
+using System.Threading;
 using Mirror;
 using UnityEngine;
-using System.Threading;
-using LightReflectiveMirror;
 
-public class TerminalPrompts : MonoBehaviour {
-
-    NetworkManager manager; 
-    Thread commandThread;
-    bool serverRunning = false;
+public class TerminalPrompts : MonoBehaviour
+{
+    NetworkManager manager;
     bool applicationRunning = false;
-
+    bool serverRunning = false;
+    
     void Start()
     {
-    #if UNITY_STANDALONE_LINUX && UNITY_SERVER
+        #if UNITY_STANDALONE_LINUX && UNITY_SERVER
         Debug.Log("Linux server detected - initializing server-only functionality.");
-        StartSeverCommands();
-    #elif UNITY_STANDALONE_WIN
+        manager = GetComponent<NetworkManager>();
+        StartServerCommands();
+        #elif UNITY_STANDALONE_WIN
         Destroy(this);
-    #endif
+        #endif
     }
 
-     void StartSeverCommands () {
-         if (!NetworkServer.active) {
-             applicationRunning = true;
-             commandThread = new Thread (ListenForCommands);
-             commandThread.Start ();
-             
-             Debug.Log ("Here's a list of usable commands: \n start, used to start the server \n stop, used to stop the server \n exit, used to exit the linux application");
-         } 
-     }
+    void StartServerCommands()
+    {
+        if (!NetworkServer.active)
+        {
+            applicationRunning = true;
+            Debug.Log("Here's a list of usable commands: \n start, used to start the server \n stop, used to stop the server \n exit, used to exit the application");
 
-     void Update () {
-    #if UNITY_STANDALONE_LINUX && UNITY_SERVER
-         if (NetworkServer.active) {
-             serverRunning = true;
-         }
-    #endif
-     }
+            // Start a new thread for listening to commands
+            Thread commandThread = new Thread(ListenForCommands);
+            commandThread.Start();
+        }
+    }
 
-     void ListenForCommands () {
-         
-         while (applicationRunning) {
-             string input = Console.ReadLine ();
+    void ListenForCommands()
+    {
+        while (applicationRunning)
+        {
+            string input = Console.ReadLine();
 
-             if(Input.GetKeyDown("enter")){
-                 switch (input) {
+            if (!string.IsNullOrEmpty(input))
+            {
+                switch (input.Trim().ToLower())
+                {
+                    case "start":
+                        StartServer();
+                        break;
                     case "stop":
-                        StopServer ();
+                        StopServer();
                         break;
-                    case "exit":
-                        ExitApp ();
+                    default:
+                        Debug.Log("Unknown command. Please use: start, stop, or exit.");
                         break;
-                } 
-             }
-         }
-         
-         
-         while (serverRunning) {
-             string input = Console.ReadLine ();
+                }
+            }
+        }
+    }
 
-             if (Input.GetKeyDown ("enter")) {
-                 if (input == "start") {
-                     Debug.Log ("Command received to start the server.");
-                     manager.StartServer ();
-                 }
-             }
-         }
-         
-     }
+    void StartServer()
+    {
+        if (!serverRunning)
+        {
+            Debug.Log("Starting the server...");
+            manager.StartServer();
+            serverRunning = true;
+        }
+        else
+        {
+            Debug.Log("Server is already running.");
+        }
+    }
 
-     void StopServer () {
-         Debug.Log ("Command received to stop the server.");
-         serverRunning = false;
-         manager.StopServer ();
-     }
-
-     void ExitApp () {
-
-         Debug.Log ("Closing application.");
-         
-         applicationRunning = false;
-         
-         if (commandThread != null && commandThread.IsAlive)
-         {
-             commandThread.Join();  // Wait for the command thread to finish
-             Debug.Log("Command thread has been safely stopped.");
-         }
-
-         Application.Quit ();
-     }
-
-   
+    void StopServer()
+    {
+        if (serverRunning)
+        {
+            Debug.Log("Stopping the server...");
+            manager.StopServer();
+            serverRunning = false;
+        }
+        else
+        {
+            Debug.Log("Server is not currently running.");
+        }
+    }
 }

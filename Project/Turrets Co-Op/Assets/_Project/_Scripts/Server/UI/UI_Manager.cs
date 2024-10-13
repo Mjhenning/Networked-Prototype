@@ -49,6 +49,18 @@ public class UI_Manager : MonoBehaviour {
     }
 
     [Client]
+    public void UpdateHealth (bool add) {
+        switch (add) {
+            case true:
+                
+                break;
+            case false:
+                HealthManager.instance.RemoveAHeart ();
+                break;
+        }
+    }
+
+    [Client]
     public void UpdateScoreText(int newScore) //updates text of scores client side
     {
         if (scoreText)

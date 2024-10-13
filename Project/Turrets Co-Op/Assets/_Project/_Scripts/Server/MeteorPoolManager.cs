@@ -63,9 +63,36 @@ public class MeteorPoolManager : NetworkBehaviour
     }
 
     [Server]
+    public Meteor[] GetMeteorsForSplit (int childAmount) {
+
+        Meteor[] children = new Meteor[3];
+        
+        if (meteorPool.Count > 0) {
+            for (int i = 0; i < childAmount; i++) {
+                GameObject meteor = meteorPool.Dequeue();
+                children[i] = meteor.GetComponent<Meteor>();
+            }
+            return children;
+        } else
+        {
+            for (int i = 0; i < childAmount; i++) {
+                GameObject meteor = Instantiate (meteorPrefab, gameObject.transform);
+                NetworkServer.Spawn (meteor);
+                children[i] = meteor.GetComponent<Meteor>();
+            }
+
+            return children;
+        }
+
+        return null;
+    }
+
+    [Server]
     public void ReturnMeteor(GameObject meteor)
     {
         // Reset and deactivate the meteor before enqueuing it back into the pool
+        meteor.transform.localScale = Vector3.one;
+        meteor.transform.rotation = new Quaternion (0, 0, 0, 0);
         meteor.transform.position = new Vector3 (0, 50, 0);
         meteorPool.Enqueue(meteor);
     }
