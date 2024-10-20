@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Mirror;
 using UnityEngine;
@@ -8,10 +9,13 @@ public class TerminalPrompts : MonoBehaviour {
     bool applicationRunning = false;
     bool serverRunning = false;
 
+    [SerializeField] List<GameObject> nonServerObjs = new List<GameObject> ();
+
     void Start () {
 #if UNITY_STANDALONE_LINUX && UNITY_SERVER
         Debug.Log ("Linux server detected - initializing server-only functionality.");
         manager = GetComponent<NetworkManager> ();
+        DestroyNonServerObjects ();
         StartServerCommands ();
 #elif UNITY_STANDALONE_WIN
         Destroy(this);
@@ -66,6 +70,13 @@ public class TerminalPrompts : MonoBehaviour {
             serverRunning = false;
         } else {
             Debug.Log ("Server is not currently running.");
+        }
+    }
+
+    void DestroyNonServerObjects () { //used to remove playfab stuff and their ui on the server
+        foreach (GameObject _obj in nonServerObjs) {
+            nonServerObjs.Remove (_obj);
+            Destroy (_obj);
         }
     }
 }
