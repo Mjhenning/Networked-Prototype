@@ -1,24 +1,23 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UILoginAcc : MonoBehaviour {
-    
+public class UILoginAcc : MonoBehaviour {               //Manager for Login UI
     [SerializeField] Text errorTxt;
     [SerializeField] Canvas canvas;
-    
+
     string username, password, emailAddress;
 
     void OnEnable () {
         UserAccManager.OnLoginFailed.AddListener (OnLoginFailed);
         UserAccManager.OnLoginSuccess.AddListener (OnLogInSuccess);
     }
-    
+
     void OnDisable () {
         UserAccManager.OnLoginFailed.RemoveListener (OnLoginFailed);
         UserAccManager.OnLoginSuccess.RemoveListener (OnLogInSuccess);
     }
 
-    void OnLoginFailed(string error) {
+    void OnLoginFailed (string error) {
         errorTxt.gameObject.SetActive (true);
         errorTxt.text = error;
     }
@@ -26,7 +25,7 @@ public class UILoginAcc : MonoBehaviour {
     void OnLogInSuccess () {
         canvas.enabled = false;
     }
-    
+
     public void UpdateUsername (string _username) {
         username = _username;
     }
@@ -38,5 +37,4 @@ public class UILoginAcc : MonoBehaviour {
     public void SignIn () {
         UserAccManager.instance.SignIn (username, password);
     }
-    
 }

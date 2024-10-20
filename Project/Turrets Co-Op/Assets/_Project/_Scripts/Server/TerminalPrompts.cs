@@ -3,85 +3,69 @@ using System.Threading;
 using Mirror;
 using UnityEngine;
 
-public class TerminalPrompts : MonoBehaviour
-{
+public class TerminalPrompts : MonoBehaviour {
     NetworkManager manager;
     bool applicationRunning = false;
     bool serverRunning = false;
-    
-    void Start()
-    {
-        #if UNITY_STANDALONE_LINUX && UNITY_SERVER
-        Debug.Log("Linux server detected - initializing server-only functionality.");
-        manager = GetComponent<NetworkManager>();
-        StartServerCommands();
-        #elif UNITY_STANDALONE_WIN
+
+    void Start () {
+#if UNITY_STANDALONE_LINUX && UNITY_SERVER
+        Debug.Log ("Linux server detected - initializing server-only functionality.");
+        manager = GetComponent<NetworkManager> ();
+        StartServerCommands ();
+#elif UNITY_STANDALONE_WIN
         Destroy(this);
-        #endif
+#endif
     }
 
-    void StartServerCommands()
-    {
-        if (!NetworkServer.active)
-        {
+    void StartServerCommands () {
+        if (!NetworkServer.active) {
             applicationRunning = true;
-            Debug.Log("Here's a list of usable commands: \n start, used to start the server \n stop, used to stop the server \n exit, used to exit the application");
+            Debug.Log ("Here's a list of usable commands: \n start, used to start the server \n stop, used to stop the server \n exit, used to exit the application");
 
             // Start a new thread for listening to commands
-            Thread commandThread = new Thread(ListenForCommands);
-            commandThread.Start();
+            Thread commandThread = new Thread (ListenForCommands);
+            commandThread.Start ();
         }
     }
 
-    void ListenForCommands()
-    {
-        while (applicationRunning)
-        {
-            string input = Console.ReadLine();
+    void ListenForCommands () {
+        while (applicationRunning) {
+            string input = Console.ReadLine ();
 
-            if (!string.IsNullOrEmpty(input))
-            {
-                switch (input.Trim().ToLower())
-                {
+            if (!string.IsNullOrEmpty (input)) {
+                switch (input.Trim ().ToLower ()) {
                     case "start":
-                        StartServer();
+                        StartServer ();
                         break;
                     case "stop":
-                        StopServer();
+                        StopServer ();
                         break;
                     default:
-                        Debug.Log("Unknown command. Please use: start, stop, or exit.");
+                        Debug.Log ("Unknown command. Please use: start or stop");
                         break;
                 }
             }
         }
     }
 
-    void StartServer()
-    {
-        if (!serverRunning)
-        {
-            Debug.Log("Starting the server...");
-            manager.StartServer();
+    void StartServer () {
+        if (!serverRunning) {
+            Debug.Log ("Starting the server...");
+            manager.StartServer ();
             serverRunning = true;
-        }
-        else
-        {
-            Debug.Log("Server is already running.");
+        } else {
+            Debug.Log ("Server is already running.");
         }
     }
 
-    void StopServer()
-    {
-        if (serverRunning)
-        {
-            Debug.Log("Stopping the server...");
-            manager.StopServer();
+    void StopServer () {
+        if (serverRunning) {
+            Debug.Log ("Stopping the server...");
+            manager.StopServer ();
             serverRunning = false;
-        }
-        else
-        {
-            Debug.Log("Server is not currently running.");
+        } else {
+            Debug.Log ("Server is not currently running.");
         }
     }
 }

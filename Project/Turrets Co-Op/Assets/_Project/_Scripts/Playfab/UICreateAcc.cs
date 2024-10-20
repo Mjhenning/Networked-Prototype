@@ -2,19 +2,18 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UICreateAcc : MonoBehaviour {
-
+public class UICreateAcc : MonoBehaviour {                    //Manager for Create Account UI
     [SerializeField] Text errorTxt;
-    
+
     [SerializeField] Canvas canvas;
-    
+
     string username, password, emailAddress;
 
     void OnEnable () {
         UserAccManager.OnCreateAccountFailed.AddListener (OnCreateAccountFailed);
         UserAccManager.OnLoginSuccess.AddListener (OnLogInSuccess);
     }
-    
+
     void OnDisable () {
         UserAccManager.OnCreateAccountFailed.RemoveListener (OnCreateAccountFailed);
         UserAccManager.OnLoginSuccess.RemoveListener (OnLogInSuccess);
@@ -24,7 +23,7 @@ public class UICreateAcc : MonoBehaviour {
         errorTxt.gameObject.SetActive (true);
         errorTxt.text = error;
     }
-    
+
     void OnLogInSuccess () {
         canvas.enabled = false;
     }
@@ -36,7 +35,7 @@ public class UICreateAcc : MonoBehaviour {
     public void UpdatePassword (string _password) {
         password = _password;
     }
-    
+
     public void UpdateEmailAddress (string _emailAddress) {
         emailAddress = _emailAddress;
     }
@@ -44,5 +43,4 @@ public class UICreateAcc : MonoBehaviour {
     public void CreateAccount () {
         UserAccManager.instance.CreatAccount (username, emailAddress, password);
     }
-    
 }
