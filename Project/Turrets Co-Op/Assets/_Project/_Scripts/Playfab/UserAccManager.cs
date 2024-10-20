@@ -127,7 +127,7 @@ public class UserAccManager : MonoBehaviour { //Overall Playfab Manager
     public void GetLeaderBoard (string key) {
         PlayFabClientAPI.GetLeaderboard (new GetLeaderboardRequest () {
             StatisticName = key,
-            MaxResultsCount = 10 
+            MaxResultsCount = 30 
         }, response => {
             Debug.Log ($"Successful GetLeaderBoard");
             if (response.Leaderboard != null) OnLeaderBoardRetrieved.Invoke (key, response.Leaderboard);

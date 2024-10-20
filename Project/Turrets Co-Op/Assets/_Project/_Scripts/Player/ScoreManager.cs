@@ -1,3 +1,4 @@
+using System;
 using Mirror;
 using UnityEngine;
 using TMPro;
@@ -41,5 +42,8 @@ public class ScoreManager : NetworkBehaviour //don't change ui only change score
             UI_Manager.instance.UpdateScoreText(newScore);
         }
     }
+    
+    
+    
     
 }

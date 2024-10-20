@@ -42,7 +42,7 @@ public class UI_Manager : MonoBehaviour {
     }
     
     [Client]
-    public void UpdatePersonalScoreText (int amount) { //Updates game over ui personal score text
+    public void UpdatePersonalScoreText (int amount) { //Updates game over ui personal score text 
         if (personalEndScoreTxt) {
             personalEndScoreTxt.text = "Personal: " + Environment.NewLine + amount;
         }

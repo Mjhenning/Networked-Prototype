@@ -61,23 +61,23 @@ public class UserProfile : MonoBehaviour {
     }
     
     
-    public void ChangeScore (float newHigh) {
+    public void SetHigh (float newHigh) { //sets new highscore and it's stat on scoreboard
         profileData.highScore = newHigh;
         SetUserData (GetUserData);
         UserAccManager.instance.SetStat ("highScore", Mathf.FloorToInt (profileData.highScore));
     }
 
-    public void SetPlayerName (string playerName) {
+    public void SetPlayerName (string playerName) { //sets new player display name
         profileData.name = playerName;
             SetUserData (GetUserData);
             UserAccManager.instance.SetDisplayName (playerName);
     }
 
-    void GetLeaderBoardHigh () {
+    void GetLeaderBoardHigh () { //retrieves leaderboard
         UserAccManager.instance.GetLeaderBoard ("highScore");
     }
     
-    void LeaderboardRetrieved (string key, List<PlayerLeaderboardEntry> leaderboardEntries) {
+    void LeaderboardRetrieved (string key, List<PlayerLeaderboardEntry> leaderboardEntries) { ///leaderboard ahs been retrieved invoke event
         if (key == "highScore") {
             OnLeaderBoardHighUpdated.Invoke (leaderboardEntries);
         }

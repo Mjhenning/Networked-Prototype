@@ -5,7 +5,7 @@ using UnityEngine;
 public class TimerManager : NetworkBehaviour {
     public static TimerManager instance;
     
-    float timeRemaining;
+    [SerializeField] float timeRemaining = 120;
 
     [SyncVar (hook = nameof (UpdateTimerColor))] [SerializeField]
     Color timerColor;
@@ -25,11 +25,7 @@ public class TimerManager : NetworkBehaviour {
    public void ToggleTimer() {
         timerIsRunning = !timerIsRunning;
     }
-
-    public override void OnStartServer () {
-        timeRemaining = 120;
-    }
-    
+   
     void Update() {
         if (!isServer) return;
 
@@ -44,7 +40,6 @@ public class TimerManager : NetworkBehaviour {
             {
                 // Decrease time remaining
                 timeRemaining -= Time.deltaTime;
-                Debug.Log("Time Remaining: " + Mathf.Round(timeRemaining)); // Print remaining time
 
                 UpdateText (timeRemaining);
             }

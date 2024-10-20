@@ -21,8 +21,7 @@ public class Player : NetworkBehaviour {
     [SerializeField] float fireRate = 0.1f;
     [SerializeField] float lastFireTime;
     [SerializeField] bool isScoring = false;
-    [SerializeField] int maxHealth = 5;
-    
+
     [SyncVar (hook = nameof(OnHealthChanged))] [SerializeField] int currentHealth = 5;
 
     [Header ("UI")]
@@ -351,7 +350,19 @@ public class Player : NetworkBehaviour {
             UI_Manager.instance.UpdatePersonalScoreText (newScore);    
         }
     }
-    
+
+    [Server]
+    public void UpdateStats () {
+        RpcUpdateStats ();
+    }
+
+    [ClientRpc]
+    void RpcUpdateStats () {
+        if (playerScore < UserProfile.instance.GetCurrentHigh()) { } else {
+            UserProfile.instance.SetHigh (playerScore);
+        }
+    }
+
     //Cooldown based logic including changing fills and calculations
     
     [Client]
