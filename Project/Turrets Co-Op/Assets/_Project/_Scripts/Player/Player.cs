@@ -22,7 +22,8 @@ public class Player : NetworkBehaviour {
     [SerializeField] float lastFireTime;
     [SerializeField] bool isScoring = false;
 
-    [SyncVar (hook = nameof(OnHealthChanged))] [SerializeField] int currentHealth = 5;
+    [SyncVar(hook = nameof(OnHealthChanged))][ShowInInspector] int currentHealth = 5;
+    readonly int maxHealth = 5;
 
     [Header ("UI")]
     [SerializeField] Crosshair chInstance;
@@ -211,12 +212,13 @@ public class Player : NetworkBehaviour {
             scoreInstance.SetColor (newColor);
         }
 
-        if (HealthManager.instance) {
-            HealthManager.instance.ChangeColor (newColor);
+        if (!isLocalPlayer) return;
+        if (UI_Manager.instance) {
+            UI_Manager.instance.ChangeHeartsColor (newColor);
         }
+
     }
-
-
+    
     //Player spawn points logic
     [Server]
     void SetPlaySpawnPos () {
@@ -401,47 +403,47 @@ public class Player : NetworkBehaviour {
     void RpcChangeColision () {
         playerCol.enabled = !playerCol.enabled;
     }
-    
+
     [Server]
     public void TweakHealth (bool add, int value) {
-
-        int newHealth;
-
-        switch (add) {
-            case true:
-                newHealth = currentHealth += value;
-                break;
-            case false:
-                newHealth = currentHealth -= value;
-                UI_Manager.instance.UpdateHealth (false);
-                break;
+        if (add) {
+            currentHealth = Mathf.Min (currentHealth + value, maxHealth); // Ensure it doesn't exceed max health
+        } else {
+            currentHealth -= value;
+            if (currentHealth <= 0) {
+                currentHealth = 0; // Prevent negative health
+            }
         }
-
-        ChangeHealth (newHealth);
-    }
-
-    [Server]
-    void ChangeHealth (int value) {
-        currentHealth = value;
     }
 
     [Client]
-    void OnHealthChanged (int oldValue, int newHealth) {
-
-        if (newHealth <= 0) {
-            InputHandler.Disable ();
-            ChangeCollision ();
-            
-
-            StartCoroutine (WaitBeforeReEnable ());
+    void OnHealthChanged (int oldHealth, int newHealth) {
+        if (isLocalPlayer) {
+            UI_Manager.instance.UpdateHealth(false);    
         }
+
         
-    } 
+        //TODO: Test Collsssion and disable logic
+        if (newHealth <= 0) {
+            InputHandler.Disable();
+            ChangeCollision();
+            StartCoroutine(WaitBeforeReEnable());
+        } 
+    }
+
+
+    [Client]
+    void Respawn() {
+        currentHealth = maxHealth;
+        UI_Manager.instance.ResetHealth();
+    }
+    
 
     IEnumerator WaitBeforeReEnable () {
         yield return new WaitForSeconds (10);
         InputHandler.Enable ();
         ChangeCollision ();
+        Respawn ();
     }
     //UI Changes
 

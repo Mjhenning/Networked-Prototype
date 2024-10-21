@@ -50,14 +50,22 @@ public class UI_Manager : MonoBehaviour {
 
     [Client]
     public void UpdateHealth (bool add) {
+
         switch (add) {
-            case true:
-                
-                break;
             case false:
                 HealthManager.instance.RemoveAHeart ();
                 break;
         }
+    }
+
+    [Client]
+    public void ResetHealth () {
+        HealthManager.instance.ResetHearts ();
+    }
+
+    [Client]
+    public void ChangeHeartsColor (Color color) {
+        HealthManager.instance.ChangeColor (color);
     }
 
     [Client]
