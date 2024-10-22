@@ -15,7 +15,7 @@ public class TerminalPrompts : MonoBehaviour {
 #if UNITY_STANDALONE_LINUX && UNITY_SERVER
         Debug.Log ("Linux server detected - initializing server-only functionality.");
         manager = GetComponent<NetworkManager> ();
-        DestroyNonServerObjects ();
+        //DestroyNonServerObjects ();
         StartServerCommands ();
 #elif UNITY_STANDALONE_WIN
         Destroy(this);
@@ -73,10 +73,10 @@ public class TerminalPrompts : MonoBehaviour {
         }
     }
 
-    void DestroyNonServerObjects () { //used to remove playfab stuff and their ui on the server
-        foreach (GameObject _obj in nonServerObjs) {
-            nonServerObjs.Remove (_obj);
-            Destroy (_obj);
-        }
-    }
+    // void DestroyNonServerObjects () { //used to remove playfab stuff and their ui on the server
+    //     foreach (GameObject _obj in nonServerObjs) {
+    //         nonServerObjs.Remove (_obj);
+    //         Destroy (_obj);
+    //     }
+    // }
 }
