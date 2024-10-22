@@ -111,6 +111,9 @@ public class UI_Manager : MonoBehaviour {
 
     [Client]
     void UpdateBtnText () {
+
+        Debug.Log ("Changing disconnect button text");
+        
         switch (NetworkManager.singleton.mode) {
             case NetworkManagerMode.Host:
                 foreach (Text _btn in dcBtnText) {

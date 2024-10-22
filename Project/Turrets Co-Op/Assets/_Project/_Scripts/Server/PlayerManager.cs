@@ -50,6 +50,8 @@ public class PlayerManager : NetworkBehaviour
     public void RegisterPlayer(Player playerRef) {
         playersList.Add(playerRef);
 
+        listChanged.Invoke ();
+        
         // Check if this is the first player to join
         if (playersList.Count == 1)
         {

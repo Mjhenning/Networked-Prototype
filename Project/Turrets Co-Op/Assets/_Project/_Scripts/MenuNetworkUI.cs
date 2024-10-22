@@ -38,13 +38,17 @@ public class MenuNetworkUI : MonoBehaviour
 
     public void StartSelectedMode () {
 
-        switch (selectedMode) {
-            case NetworkManagerMode.ClientOnly:
-                manager.StartClient(); break;
-            case NetworkManagerMode.Host:
-                manager.StartHost(); break;
-            case NetworkManagerMode.ServerOnly:
-                manager.StartServer(); break;
+        if (UIProfile.instance.playerNameText.text != null &&UIProfile.instance.playerNameText.text != "") {
+            switch (selectedMode) {
+                case NetworkManagerMode.ClientOnly:
+                    manager.StartClient(); break;
+                case NetworkManagerMode.Host:
+                    manager.StartHost(); break;
+                case NetworkManagerMode.ServerOnly:
+                    manager.StartServer(); break;
+            }
+        } else {
+            UIProfile.instance.DisplayErrorMessage ();
         }
     }
 }

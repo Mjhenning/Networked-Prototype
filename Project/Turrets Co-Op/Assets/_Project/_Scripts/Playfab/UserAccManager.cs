@@ -86,13 +86,15 @@ public class UserAccManager : MonoBehaviour { //Overall Playfab Manager
     }
 
     public void SetDisplayName (string displayname) {
-        PlayFabClientAPI.UpdateUserTitleDisplayName (new UpdateUserTitleDisplayNameRequest () {
-            DisplayName = displayname
-        }, response => {
-            Debug.Log ($"Successful SetDisplayName");
-        }, error => {
-            Debug.Log ($"Unsuccessful SetDisplayName: {error.ErrorMessage}");
-        }); 
+        if (displayname != null && displayname != "") {
+            PlayFabClientAPI.UpdateUserTitleDisplayName (new UpdateUserTitleDisplayNameRequest () {
+                DisplayName = displayname
+            }, response => {
+                Debug.Log ($"Successful SetDisplayName");
+            }, error => {
+                Debug.Log ($"Unsuccessful SetDisplayName: {error.ErrorMessage}");
+            }); 
+        }
     }
     
     //STATS & LEADERBOARDS
