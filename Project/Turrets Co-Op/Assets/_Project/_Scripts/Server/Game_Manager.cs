@@ -22,7 +22,7 @@ public class Game_Manager : NetworkBehaviour
     {
         if (UI_Manager.instance)
         {
-            startGame.AddListener(UI_Manager.instance.ToggleButtonVisibility);
+            startGame.AddListener(UI_Manager.instance.ToggleStartBtn);
         }
 
         if (TimerManager.instance)
@@ -102,5 +102,16 @@ public class Game_Manager : NetworkBehaviour
     {
         startGame.Invoke();
         Debug.Log ("Starting the game");
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdReloadOnlineScene () {
+        ReloadOnlineScene ();
+    }
+
+    [Server]
+    void ReloadOnlineScene () {
+        Debug.Log ("Reloading Scene");
+        NetworkManager.singleton.ServerChangeScene ("Online");
     }
 }

@@ -10,6 +10,7 @@ public class HealthManager : MonoBehaviour {
     public static HealthManager instance;
     
     [SerializeField]List<GameObject> hearts = new List<GameObject>();
+    [SerializeField] Transform heartsParent;
 
 
     void Awake () {
@@ -31,7 +32,7 @@ public class HealthManager : MonoBehaviour {
     [Client]
 
     public void ResetHearts () {
-        foreach (Transform _child in transform) {
+        foreach (Transform _child in heartsParent) {
             hearts.Add (_child.gameObject);
             _child.gameObject.SetActive (true);
         }

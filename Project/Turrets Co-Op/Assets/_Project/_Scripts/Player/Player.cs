@@ -22,8 +22,8 @@ public class Player : NetworkBehaviour {
     [SerializeField] float lastFireTime;
     [SerializeField] bool isScoring = false;
 
-    [SyncVar(hook = nameof(OnHealthChanged))][ShowInInspector] int currentHealth = 5;
-    readonly int maxHealth = 5;
+    [SyncVar(hook = nameof(OnHealthChanged))][ShowInInspector] int currentHealth = 3;
+    readonly int maxHealth = 3;
 
     [Header ("UI")]
     [SerializeField] Crosshair chInstance;
@@ -50,7 +50,7 @@ public class Player : NetworkBehaviour {
     public override void OnStopServer () {
         Debug.Log ($"[Player{netId}] OnStopServer");
 
-        DeRegisterMe ();
+       // DeRegisterMe ();
     }
 
     public override void OnStartLocalPlayer () {
@@ -63,7 +63,18 @@ public class Player : NetworkBehaviour {
         Debug.Log ($"[Player{netId}] OnStopLocalPlayer");
         DeInitializePlayer ();
     }
-
+    
+    void OnDisable()
+    {
+        DeRegisterMe();
+        DeInitializePlayer();
+    }
+    
+    void OnDestroy()
+    {
+        StopAllCoroutines(); // Stop all running coroutines when the player is destroyed
+    }
+    
     void Update () { //handle look and cooldowns
         if (isLocalPlayer) HandleLook ();
         if (isLocalPlayer && GetCooldownProgress () <= 1f) ChangeFillAmount(GetCooldownProgress());
@@ -94,7 +105,10 @@ public class Player : NetworkBehaviour {
     }
 
     void DeInitializePlayer () {
-        DeRegisterInputs ();
+        if (isLocalPlayer) {
+            DeRegisterMe ();
+            DeRegisterInputs();
+        }
     }
 
     [Client]
@@ -289,16 +303,21 @@ public class Player : NetworkBehaviour {
     //Firing input handling
     
     [Client]
-    void HandleFiring (bool firing) {
+    void HandleFiring(bool firing)
+    {
         isFiring = firing;
-        if (isFiring) {
-            StartCoroutine (FiringBullets ());
+        if (isFiring)
+        {
+            if (this != null) // Check if the player object still exists
+            {
+                StartCoroutine(FiringBullets());
+            }
         }
     }
 
     [Client]
     IEnumerator FiringBullets() {
-        while (isFiring) {
+        while (isFiring && this != null) {
             if (Time.time >= lastFireTime + fireRate) {
                 CmdFireBullet();
                 lastFireTime = Time.time;
@@ -338,6 +357,11 @@ public class Player : NetworkBehaviour {
                 UpdateScore (amount);
             }
         }
+    }
+
+    [Server]
+    public void RemoveScoreOnDisconnect () {
+        ScoreManager.instance.UpdateScore (-playerScore);
     }
 
     [Server]
@@ -393,6 +417,11 @@ public class Player : NetworkBehaviour {
     
     // Health Logic
 
+    [Server]
+    public void CallChangeCollision () {
+        RpcChangeColision ();
+    }
+
     [Command]
     void ChangeCollision () {
         RpcChangeColision ();
@@ -439,12 +468,21 @@ public class Player : NetworkBehaviour {
     }
     
 
+    [Client]
     IEnumerator WaitBeforeReEnable () {
         yield return new WaitForSeconds (10);
         InputHandler.Enable ();
         ChangeCollision ();
         Respawn ();
     }
-    //UI Changes
+    
+    
+    //Player sync on other player Disconnect
+
+    [Server]
+    public void SyncMe () {
+        SetPlaySpawnPos ();
+        SetColor ();
+    }
 
 }

@@ -10,7 +10,7 @@ public class MeteorPoolManager : NetworkBehaviour {
 
     public GameObject meteorPrefab;
     [ShowInInspector] Queue<GameObject> meteorPool = new Queue<GameObject> ();
-    public int poolSize = 20;
+    public int poolSize = 100;
 
     [Header ("Wall Setup")]
     // Define the plane (wall) dimensions
@@ -71,6 +71,7 @@ public class MeteorPoolManager : NetworkBehaviour {
         } else {
             for (int i = 0; i < childAmount; i++) {
                 GameObject meteor = Instantiate (meteorPrefab, gameObject.transform);
+                meteor.transform.position = new Vector3 (0, 50, 0);
                 NetworkServer.Spawn (meteor);
                 children[i] = meteor.GetComponent<Meteor> ();
             }

@@ -1,19 +1,24 @@
 using System;
+using System.Collections.Generic;
 using Mirror;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UI_Manager : MonoBehaviour { 
     
     public static UI_Manager instance;
-    
-    [SerializeField] GameObject startBtn;
+
+    [SerializeField] GameObject hostRetryBtn;
+    [SerializeField] GameObject hostStartBtn;
     [SerializeField] TMP_Text scoreText; // Reference to the UI Text component
     [SerializeField] TMP_Text timerText;
 
     [SerializeField] GameObject endScreen;
     [SerializeField] TMP_Text endScoreTxt;
     [SerializeField] TMP_Text personalEndScoreTxt;
+
+    [SerializeField] List<Text> dcBtnText = new List<Text> ();
 
     void Awake () {
         instance = this;
@@ -23,16 +28,27 @@ public class UI_Manager : MonoBehaviour {
 
         if (Game_Manager.instance) {
             Game_Manager.instance.endGame.AddListener (ToggleGameOver);
-            
         }
 
-        ToggleButtonVisibility ();
+        if (PlayerManager.instance) {
+            PlayerManager.instance.listChanged.AddListener (UpdateBtnText);
+        }
     }
 
+    [Client]
     public void ToggleButtonVisibility () {
-        if (NetworkManager.singleton.mode == NetworkManagerMode.Host){ //TODO: need a way that the host (first client that joins active server) can start instead of only the server
-            startBtn.SetActive (!startBtn.activeSelf);  
-        }
+
+        Debug.Log ("Toggling button visibility " + "Current player count is " + PlayerManager.instance.playersList.Count);
+        
+        if (PlayerManager.instance.playersList.Count > 1) return;
+        
+        //hostRetryBtn.SetActive (!hostRetryBtn.activeSelf);
+        ToggleStartBtn ();
+    }
+
+    [Client]
+    public void ToggleStartBtn () {
+        hostStartBtn.SetActive (!hostStartBtn.activeSelf); 
     }
 
     [Client]
@@ -92,5 +108,38 @@ public class UI_Manager : MonoBehaviour {
     public void UpdateTimerTextColor (Color color) { //updates timer text color client side
         timerText.color = color;
     }
- 
+
+    [Client]
+    void UpdateBtnText () {
+        switch (NetworkManager.singleton.mode) {
+            case NetworkManagerMode.Host:
+                foreach (Text _btn in dcBtnText) {
+                    _btn.text = "STOP HOSTING";
+                }
+                break;
+            case NetworkManagerMode.ClientOnly:
+                foreach (Text _btn in dcBtnText) {
+                    _btn.text = "DISCONNECT";
+                }
+                break;
+        }
+    }
+
+    [Client]
+    public void Disconnect () { //on button press check local player mode and disconnect them or stop hosting entirely
+        switch (NetworkManager.singleton.mode) {
+            case NetworkManagerMode.Host:
+                NetworkManager.singleton.StopHost ();
+                break;
+            case NetworkManagerMode.ClientOnly:
+                NetworkManager.singleton.StopClient ();
+                break;
+        }
+    }
+
+    [Client]
+    public void Retry () {
+        Game_Manager.instance.CmdReloadOnlineScene ();
+    }
+
 }
