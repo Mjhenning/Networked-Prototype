@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Mirror;
 using UnityEngine;
 using TMPro;
@@ -21,7 +22,7 @@ public class ScoreManager : NetworkBehaviour //don't change ui only change score
     {
         score = 0;
     }
-
+    
     [Server]
     public void ToggleScoring () { //allow/disallow scoring
         gameActive = !gameActive;

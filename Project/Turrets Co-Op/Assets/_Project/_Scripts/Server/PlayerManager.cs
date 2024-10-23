@@ -17,34 +17,6 @@ public class PlayerManager : NetworkBehaviour
     {
         instance = this;
     }
-
-    void OnEnable () {
-        if (Game_Manager.instance != null) {
-            Game_Manager.instance.endGame.AddListener (UpdatePlayerHighs);
-            Game_Manager.instance.endGame.AddListener (TogglePlayerCollisions);
-            Game_Manager.instance.startGame.AddListener (TogglePlayerCollisions);
-
-            listChanged.AddListener (SyncPlayers);
-        } else {
-            StartCoroutine (WaitForGameManager ());
-        }
-    }
-    
-    void OnDisable () {
-        Game_Manager.instance.endGame.RemoveListener (UpdatePlayerHighs);
-        Game_Manager.instance.endGame.RemoveListener (TogglePlayerCollisions);
-        
-        Game_Manager.instance.startGame.RemoveListener (TogglePlayerCollisions);
-    }
-    
-    IEnumerator WaitForGameManager() {
-        while (Game_Manager.instance == null) {
-            yield return null; // Wait for the next frame
-        }
-    
-        // Once Game_Manager.instance is not null, add the listener
-        Game_Manager.instance.endGame.AddListener (UpdatePlayerHighs);
-    }
     
     [Server] 
     public void RegisterPlayer(Player playerRef) {
@@ -85,17 +57,19 @@ public class PlayerManager : NetworkBehaviour
     
     // Method for server to trigger game end Score Update checks for each player
     [Server]
-    void UpdatePlayerHighs () {
+    public void UpdatePlayerHighs () {
         foreach (Player _player in playersList) {
             _player.UpdateStats ();
         }
     }
 
     [Server]
-    void TogglePlayerCollisions () {
-        foreach (Player _player in playersList) {
-            if (_player != null) {
-                _player.CallChangeCollision ();
+    public void TogglePlayerCollisions () {
+        if (isServer) {
+            foreach (Player _player in playersList) {
+                if (_player != null) {
+                    _player.ChangeCollision ();
+                }
             }
         }
     }

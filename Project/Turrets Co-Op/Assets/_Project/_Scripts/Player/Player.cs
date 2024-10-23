@@ -20,7 +20,7 @@ public class Player : NetworkBehaviour {
     [Header ("Gameplay")]
     [SerializeField] float fireRate = 0.1f;
     [SerializeField] float lastFireTime;
-    [SerializeField] bool isScoring = false;
+    [SyncVar][SerializeField] bool isScoring = false;
 
     [SyncVar(hook = nameof(OnHealthChanged))][ShowInInspector] int currentHealth = 3;
     readonly int maxHealth = 3;
@@ -81,7 +81,7 @@ public class Player : NetworkBehaviour {
     }
     
     void Start () {
-        if (Game_Manager.instance) {
+        if (Game_Manager.instance != null && isServer) {
             Game_Manager.instance.startGame.AddListener (ToggleScoring);
             Game_Manager.instance.endGame.AddListener (ToggleScoring);
         }
@@ -344,7 +344,7 @@ public class Player : NetworkBehaviour {
     
     //Score logic
 
-    [Client]
+    [Server]
     void ToggleScoring () {
         isScoring = !isScoring;
     }
@@ -418,17 +418,19 @@ public class Player : NetworkBehaviour {
     // Health Logic
 
     [Server]
-    public void CallChangeCollision () {
-        RpcChangeColision ();
+    public void ChangeCollision () {
+        if (isServer) {
+            playerCol.enabled = !playerCol.enabled;
+            RpcChangeColision (); 
+        }
     }
 
-    [Command]
-    void ChangeCollision () {
-        RpcChangeColision ();
+    [Command(requiresAuthority = false)]
+    void CmdChangeCollision () {
+        ChangeCollision ();
     }
 
     [ClientRpc]
-
     void RpcChangeColision () {
         playerCol.enabled = !playerCol.enabled;
     }
@@ -455,7 +457,7 @@ public class Player : NetworkBehaviour {
         //TODO: Test Collsssion and disable logic
         if (newHealth <= 0) {
             InputHandler.Disable();
-            ChangeCollision();
+            CmdChangeCollision();
             StartCoroutine(WaitBeforeReEnable());
         } 
     }
@@ -472,7 +474,7 @@ public class Player : NetworkBehaviour {
     IEnumerator WaitBeforeReEnable () {
         yield return new WaitForSeconds (10);
         InputHandler.Enable ();
-        ChangeCollision ();
+        CmdChangeCollision ();
         Respawn ();
     }
     

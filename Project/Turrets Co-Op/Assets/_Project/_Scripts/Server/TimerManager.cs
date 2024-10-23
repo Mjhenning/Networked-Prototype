@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Mirror;
 using UnityEngine;
 
@@ -21,9 +22,9 @@ public class TimerManager : NetworkBehaviour {
         if (instance == null) instance = this;
     }
     
-    [Server]
-   public void ToggleTimer() {
-        timerIsRunning = !timerIsRunning;
+    [Server] 
+    public void ToggleTimer() {
+       timerIsRunning = !timerIsRunning;
     }
    
     void Update() {

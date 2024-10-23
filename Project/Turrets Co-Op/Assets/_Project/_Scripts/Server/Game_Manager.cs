@@ -20,21 +20,53 @@ public class Game_Manager : NetworkBehaviour
 
     void Start() //adds listeners to all online components
     {
-        if (UI_Manager.instance)
+        if (UI_Manager.instance && isClient)
         {
             startGame.AddListener(UI_Manager.instance.ToggleStartBtn);
         }
 
-        if (TimerManager.instance)
-        {
-            startGame.AddListener(TimerManager.instance.ToggleTimer);
-            endGame.AddListener(TimerManager.instance.ToggleTimer);
-        }
-
-        if (ScoreManager.instance)
-        {
+        if (ScoreManager.instance != null && isServer) {
             startGame.AddListener(ScoreManager.instance.ToggleScoring);
             endGame.AddListener(ScoreManager.instance.ToggleScoring);
+            
+        }
+
+        if (TimerManager.instance != null && isServer) {
+            startGame.AddListener (TimerManager.instance.ToggleTimer);
+            endGame.AddListener (TimerManager.instance.ToggleTimer);
+        }
+
+        if (PlayerManager.instance != null && isServer) {
+            endGame.AddListener (PlayerManager.instance.UpdatePlayerHighs);
+
+            startGame.AddListener (PlayerManager.instance.TogglePlayerCollisions);
+            endGame.AddListener (PlayerManager.instance.TogglePlayerCollisions);
+        }
+        
+    }
+
+    void OnDisable () {
+        if (UI_Manager.instance && isClient)
+        {
+            startGame.RemoveListener(UI_Manager.instance.ToggleStartBtn);
+        }
+
+        if (ScoreManager.instance != null && isServer) {
+            startGame.RemoveListener(ScoreManager.instance.ToggleScoring);
+            endGame.RemoveListener(ScoreManager.instance.ToggleScoring);
+            
+        }
+
+        if (TimerManager.instance != null && isServer) {
+            startGame.RemoveListener (TimerManager.instance.ToggleTimer);
+            endGame.RemoveListener (TimerManager.instance.ToggleTimer);
+        }
+
+        if (PlayerManager.instance != null && isServer) {
+            endGame.RemoveListener (PlayerManager.instance.UpdatePlayerHighs);
+
+            startGame.RemoveListener (PlayerManager.instance.TogglePlayerCollisions);
+            endGame.RemoveListener (PlayerManager.instance.TogglePlayerCollisions);
         }
     }
 
@@ -86,23 +118,26 @@ public class Game_Manager : NetworkBehaviour
 
     // Method for server to trigger game start
     [Server]
-    public void CallGameStart()
+    void CallGameStart()
     {
-        RpcCallGameStart();
+        startGame.Invoke();
+        Debug.Log ("Starting the game Serverside");
     }
 
-    [Command]
-    void CmdCallGameStart()
-    {
-        CallGameStart();
+    [Command(requiresAuthority = false)]
+    void CmdCallGameStart() { //command used to fire start game on both clients and server
+        RpcCallGameStart ();
+
+        if (isServer) { CallGameStart ();} //only if isServer call the game start for the server too
     }
 
     [ClientRpc]
-    void RpcCallGameStart()
+    void RpcCallGameStart() //syncs start game to all cleints
     {
         startGame.Invoke();
-        Debug.Log ("Starting the game");
+        Debug.Log ("Starting the game Clientside");
     }
+    
 
     [Command(requiresAuthority = false)]
     public void CmdReloadOnlineScene () {
