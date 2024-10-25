@@ -23,22 +23,22 @@ public class UIProfile : MonoBehaviour {
         instance = this;
     }
 
-    void Login () {
+    void Login () { //sets login screen alpha to 1
         GetComponent<CanvasGroup> ().alpha = 1;
     }
 
-    void ProfileDataUpdated (ProfileData profileData) {
+    void ProfileDataUpdated (ProfileData profileData) { //once pprofile data has been updated set text fields according to retrieved data
         if (profileData != null) {
             if (profileData.name != null) playerNameText.text = profileData.name;
             if (profileData.highScore != 0) playerHighestScoreText.text = Mathf.Floor(profileData.highScore).ToString();
         }
     }
 
-    public void DisplayErrorMessage () {
+    public void DisplayErrorMessage () { //used to enable error message when display name text field is empty
         errorText.gameObject.SetActive (true);
     }
 
-    public void HideErrorMessage () {
+    public void HideErrorMessage () { //used to hide error message
         if (errorText.gameObject.activeSelf) {
             errorText.gameObject.SetActive (false);
         }

@@ -72,7 +72,7 @@ public class UserAccManager : MonoBehaviour { //Overall Playfab Manager
         });
     }
 
-    public void SetUserData (string key, string value, UnityAction OnSuccess = null) {
+    public void SetUserData (string key, string value, UnityAction OnSuccess = null) { //used to set logged in user's data
         PlayFabClientAPI.UpdateUserData (new UpdateUserDataRequest () {
             Data = new Dictionary<string, string>() {
                 {key, value}
@@ -85,7 +85,7 @@ public class UserAccManager : MonoBehaviour { //Overall Playfab Manager
         });
     }
 
-    public void SetDisplayName (string displayname) {
+    public void SetDisplayName (string displayname) { //used to set logged in user's displayname
         if (displayname != null && displayname != "") {
             PlayFabClientAPI.UpdateUserTitleDisplayName (new UpdateUserTitleDisplayNameRequest () {
                 DisplayName = displayname

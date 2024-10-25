@@ -37,12 +37,12 @@ public class UserProfile : MonoBehaviour {
         GetLeaderBoardHigh ();
     }
 
-    [ContextMenu("Get Profile Data")]
-    void GetUserData () {
+    [ContextMenu("Get Profile Data")] 
+    void GetUserData () { //Calls get user data on useraccmanager to get data according to a key from playfab api
         UserAccManager.instance.GetUserData ("ProfileData");
     }
     
-    void UserDataRetrieved (string key, string value) {
+    void UserDataRetrieved (string key, string value) { //once data is retrieved convert from json to progfiledata class else if nothing retrieved create new profile data and updat player profiledata with empty profiledata
         if (key == "ProfileData" && value != null) {
             profileData = JsonUtility.FromJson<ProfileData> (value);
             OnProfileDataUpdated.Invoke (profileData);
@@ -52,7 +52,7 @@ public class UserProfile : MonoBehaviour {
         }
     }
     
-    void SetUserData (UnityAction OnSuccess = null) {
+    void SetUserData (UnityAction OnSuccess = null) { //sets user data according to playfab key and profiledata class
         UserAccManager.instance.SetUserData ("ProfileData", JsonUtility.ToJson (profileData), OnSuccess);
     }
 
