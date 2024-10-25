@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class MenuNetworkUI : MonoBehaviour
 {
 
-    NetworkManagerMode selectedMode = NetworkManagerMode.Host;
+    NetworkManagerMode selectedMode = NetworkManagerMode.ClientOnly;
     
     [SerializeField]NetworkManager manager;
 
@@ -16,11 +16,11 @@ public class MenuNetworkUI : MonoBehaviour
 
     public void SelectMode (int index) {
         switch (index) {
+            // case 0:                                               //Removed because of Gaas Implementation
+            //     selectedMode = NetworkManagerMode.Host; break;
             case 0:
-                selectedMode = NetworkManagerMode.Host; break;
-            case 1:
                 selectedMode = NetworkManagerMode.ClientOnly; break;
-            case 2:
+            case 1:
                 selectedMode = NetworkManagerMode.ServerOnly; break;
         }
     }
@@ -38,7 +38,7 @@ public class MenuNetworkUI : MonoBehaviour
 
     public void StartSelectedMode () {
 
-        if (UIProfile.instance.playerNameText.text != null &&UIProfile.instance.playerNameText.text != "") {
+        if (UIProfile.instance.playerNameText.text != null && UIProfile.instance.playerNameText.text != "") {
             switch (selectedMode) {
                 case NetworkManagerMode.ClientOnly:
                     manager.StartClient(); break;

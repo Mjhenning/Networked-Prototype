@@ -2,6 +2,7 @@ using System;
 using Mirror;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 //Online scene overall manager
 
@@ -20,10 +21,6 @@ public class Game_Manager : NetworkBehaviour
 
     void Start() //adds listeners to all online components
     {
-        if (UI_Manager.instance && isClient)
-        {
-            startGame.AddListener(UI_Manager.instance.ToggleStartBtn);
-        }
 
         if (ScoreManager.instance != null && isServer) {
             startGame.AddListener(ScoreManager.instance.ToggleScoring);
@@ -75,47 +72,37 @@ public class Game_Manager : NetworkBehaviour
         obj.parent = transform;
         obj.localScale = Vector3.one;
     }
-
-    // Method for clients to request game end
-    [Client]
-    public void RequestGameEnd()
-    {
-        if (isLocalPlayer)
-        {
-            CmdCallGameEnd();
-        }
-    }
+    
+    
+    //CALL GAME END
 
     // Method for server to trigger game end
     [Server]
     public void CallGameEnd()
     {
-        RpcCallGameEnd();
-    }
+        if (isServer) {
+            endGame.Invoke();
+            
+            
+            PlayerManager.instance.TogglePlayerCrosshairs();
+        
+            Debug.Log ("Ending the game Serverside");
+        }
 
-    [Command]
-    void CmdCallGameEnd()
-    {
-        CallGameEnd();
+        RpcCallGameEnd ();
     }
-
+    
     [ClientRpc]
     void RpcCallGameEnd()
     {
         endGame.Invoke();
         Time.timeScale = 0;
+        
+        Debug.Log ("Ending the game Clientside");
     }
-
-    // Method for clients to request game start
-    [Client]
-    public void RequestGameStart()
-    {
-        if (isLocalPlayer)
-        {
-            CmdCallGameStart();
-        }
-    }
-
+    
+    //CALL GAME START    SETUP IN THIS WAY BECAUSE START GAME IS ONLY CALLED FROM CLIENT
+    
     // Method for server to trigger game start
     [Server]
     void CallGameStart()
@@ -139,14 +126,17 @@ public class Game_Manager : NetworkBehaviour
     }
     
 
+    //CALL GAME RELOAD
+    
     [Command(requiresAuthority = false)]
     public void CmdReloadOnlineScene () {
         ReloadOnlineScene ();
     }
 
     [Server]
-    void ReloadOnlineScene () {
+    public void ReloadOnlineScene () {
         Debug.Log ("Reloading Scene");
         NetworkManager.singleton.ServerChangeScene ("Online");
     }
+    
 }

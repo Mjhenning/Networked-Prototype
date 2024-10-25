@@ -9,32 +9,40 @@ using UnityEngine.UI;
 public class HealthManager : MonoBehaviour {
     public static HealthManager instance;
     
-    [SerializeField]List<GameObject> hearts = new List<GameObject>();
-    [SerializeField] Transform heartsParent;
+    [SerializeField]List<GameObject> hearts;
+
+    [SerializeField]Transform heartsParent;
 
 
     void Awake () {
         instance = this;
+        ResetHearts ();
     }
 
     [Client]
-    public void ChangeColor (Color playercolor) { //changes client side heart color
+    public void ChangeHeartsColor (Color playercolor) { //changes client side heart color
         foreach (GameObject _heart in hearts) {
             _heart.GetComponent<Image> ().color = playercolor;
         }
     }
 
     [Client]
-    public void RemoveAHeart () { //removes last hearts on list
+    public void RemoveAHeart() {
         hearts[^1].SetActive (false);
         hearts.Remove (hearts[^1]);
+        Debug.Log ("Removed a heart");
     }
-    [Client]
 
-    public void ResetHearts () {
+    [Client]
+    public void ResetHearts() {
+
+        hearts.Clear ();
+        
         foreach (Transform _child in heartsParent) {
-            hearts.Add (_child.gameObject);
-            _child.gameObject.SetActive (true);
+            GameObject _gameObject;
+            (_gameObject = _child.gameObject).SetActive (true);
+            hearts.Add (_gameObject);
+            Debug.Log ("added a heart");
         }
     }
 }

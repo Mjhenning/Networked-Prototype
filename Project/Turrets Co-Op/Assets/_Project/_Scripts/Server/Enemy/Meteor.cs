@@ -29,7 +29,7 @@ public class Meteor : NetworkBehaviour {
     void OnCollisionEnter (Collision other) {
         if (other.transform.GetComponent<Player>()) {
             Player _player = other.transform.GetComponent<Player> ();
-            _player.TweakHealth (false, 1);
+            _player.TakeDamage();
             DestroyWEffect ();
         }
     }

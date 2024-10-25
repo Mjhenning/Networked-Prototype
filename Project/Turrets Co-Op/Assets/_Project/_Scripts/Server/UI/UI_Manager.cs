@@ -24,35 +24,50 @@ public class UI_Manager : MonoBehaviour {
         instance = this;
     }
     
-    void Start () {
-
-        if (Game_Manager.instance) {
-            Game_Manager.instance.endGame.AddListener (ToggleGameOver);
-        }
-
-        if (PlayerManager.instance) {
-            PlayerManager.instance.listChanged.AddListener (UpdateBtnText);
-        }
+    [Client]
+    void Start() {
+        Game_Manager.instance.endGame.AddListener(ToggleGameOver);
     }
 
+
     [Client]
-    public void ToggleButtonVisibility () {
+    public void ToggleButtonVisibility (Player playerRef) {
 
         Debug.Log ("Toggling button visibility " + "Current player count is " + PlayerManager.instance.playersList.Count);
         
-        if (PlayerManager.instance.playersList.Count > 1) return;
+        if (PlayerManager.instance.playersList.IndexOf(playerRef) > 0 || PlayerManager.instance.playersList.Count > 1) return;
         
-        //hostRetryBtn.SetActive (!hostRetryBtn.activeSelf);
         ToggleStartBtn ();
     }
 
     [Client]
     public void ToggleStartBtn () {
+        Debug.Log ("Toggling Start Btn");
+        
         hostStartBtn.SetActive (!hostStartBtn.activeSelf); 
     }
 
+
+
     [Client]
-    void ToggleGameOver () { //enables game over UI
+    public void UpdateBtnText (Player _playerRef) {  //TODO: Rework host button isn't stop hosting
+        
+        Debug.Log ("Changing disconnect button text " + "Current player index " + PlayerManager.instance.playersList.IndexOf(_playerRef));
+
+        if (PlayerManager.instance.playersList.IndexOf(_playerRef) == 0 || PlayerManager.instance.playersList.Count <= 1) {
+            foreach (Text _btn in dcBtnText) {
+                _btn.text = "STOP HOSTING";
+            }
+        } else {
+            foreach (Text _btn in dcBtnText) {
+                _btn.text = "DISCONNECT";
+            } 
+        }
+    }
+    
+    
+    [Client]
+    void ToggleGameOver () { //enables game over UI and disable client crosshairs
         endScreen.SetActive (!endScreen.activeSelf);
         scoreText.gameObject.SetActive (false);
     }
@@ -63,27 +78,8 @@ public class UI_Manager : MonoBehaviour {
             personalEndScoreTxt.text = "Personal: " + Environment.NewLine + amount;
         }
     }
-
-    [Client]
-    public void UpdateHealth (bool add) {
-
-        switch (add) {
-            case false:
-                HealthManager.instance.RemoveAHeart ();
-                break;
-        }
-    }
-
-    [Client]
-    public void ResetHealth () {
-        HealthManager.instance.ResetHearts ();
-    }
-
-    [Client]
-    public void ChangeHeartsColor (Color color) {
-        HealthManager.instance.ChangeColor (color);
-    }
-
+    
+    
     [Client]
     public void UpdateScoreText(int newScore) //updates text of scores client side
     {
@@ -108,25 +104,7 @@ public class UI_Manager : MonoBehaviour {
     public void UpdateTimerTextColor (Color color) { //updates timer text color client side
         timerText.color = color;
     }
-
-    [Client]
-    void UpdateBtnText () {
-
-        Debug.Log ("Changing disconnect button text");
-        
-        switch (NetworkManager.singleton.mode) {
-            case NetworkManagerMode.Host:
-                foreach (Text _btn in dcBtnText) {
-                    _btn.text = "STOP HOSTING";
-                }
-                break;
-            case NetworkManagerMode.ClientOnly:
-                foreach (Text _btn in dcBtnText) {
-                    _btn.text = "DISCONNECT";
-                }
-                break;
-        }
-    }
+    
 
     [Client]
     public void Disconnect () { //on button press check local player mode and disconnect them or stop hosting entirely

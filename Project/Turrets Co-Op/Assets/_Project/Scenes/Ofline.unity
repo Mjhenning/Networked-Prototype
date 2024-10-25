@@ -5889,17 +5889,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
---- !u!114 &1684868473 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1092423521151845914, guid: 8bb95cc392e1a7f49a31801855e909c8, type: 3}
-  m_PrefabInstance: {fileID: 2190997215736652168}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 461f4741b1795af42aff6f0ec22d54a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1764249973 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1909360218137112630, guid: 8bb95cc392e1a7f49a31801855e909c8, type: 3}
@@ -6014,6 +6003,10 @@ PrefabInstance:
     - target: {fileID: 7075252661863990487, guid: 3fc883ed063efea4cb6447d34f0b33b0, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7263193346492972010, guid: 3fc883ed063efea4cb6447d34f0b33b0, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7263193346492972011, guid: 3fc883ed063efea4cb6447d34f0b33b0, type: 3}
       propertyPath: m_Pivot.x
@@ -6246,6 +6239,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 440
       objectReference: {fileID: 0}
+    - target: {fileID: 1094980302841843025, guid: 6473fa90cf5f18741b4ad32ac4592223, type: 3}
+      propertyPath: m_Alpha
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1586254396109007015, guid: 6473fa90cf5f18741b4ad32ac4592223, type: 3}
+      propertyPath: m_Text
+      value: JOIN
+      objectReference: {fileID: 0}
     - target: {fileID: 1588182494379510856, guid: 6473fa90cf5f18741b4ad32ac4592223, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -6269,7 +6270,19 @@ PrefabInstance:
     - target: {fileID: 3938412496125521032, guid: 6473fa90cf5f18741b4ad32ac4592223, type: 3}
       propertyPath: m_OnDeselect.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1684868473}
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935774598213354595, guid: 6473fa90cf5f18741b4ad32ac4592223, type: 3}
+      propertyPath: m_Options.m_Options.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935774598213354595, guid: 6473fa90cf5f18741b4ad32ac4592223, type: 3}
+      propertyPath: m_Options.m_Options.Array.data[0].m_Text
+      value: Join Game
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935774598213354595, guid: 6473fa90cf5f18741b4ad32ac4592223, type: 3}
+      propertyPath: m_Options.m_Options.Array.data[1].m_Text
+      value: Only Server
+      objectReference: {fileID: 0}
     - target: {fileID: 5196389411393682286, guid: 6473fa90cf5f18741b4ad32ac4592223, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0

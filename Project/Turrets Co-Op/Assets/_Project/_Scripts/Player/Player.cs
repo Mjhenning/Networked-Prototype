@@ -34,6 +34,7 @@ public class Player : NetworkBehaviour {
     
     public override void OnStartClient () {
         Debug.Log ($"[Player{netId}] OnStartClient");
+        DeInitializePlayer ();
     }
 
     public override void OnStopClient () {
@@ -50,25 +51,30 @@ public class Player : NetworkBehaviour {
     public override void OnStopServer () {
         Debug.Log ($"[Player{netId}] OnStopServer");
 
-       // DeRegisterMe ();
+       DeRegisterMe ();
     }
 
     public override void OnStartLocalPlayer () {
         Debug.Log ($"[Player{netId}] OnStartLocalPlayer");
 
         RegisterInputs ();
+
+        if (ScoreManager.instance.gameActive) { //for late users so they have collisions
+            CmdChangeCollision ();
+            CmdToggleScoring ();
+        }
     }
 
     public override void OnStopLocalPlayer () {
         Debug.Log ($"[Player{netId}] OnStopLocalPlayer");
-        DeInitializePlayer ();
     }
     
-    void OnDisable()
-    {
-        DeRegisterMe();
-        DeInitializePlayer();
-    }
+    
+    // void OnDisable()
+    // {
+    //     DeRegisterMe();
+    //     DeInitializePlayer();
+    // }
     
     void OnDestroy()
     {
@@ -90,23 +96,26 @@ public class Player : NetworkBehaviour {
     
     //Registration and Initialization
 
+    [Server]
     void RegisterMe () {
         PlayerManager.instance.RegisterPlayer (this);
     }
 
+    [Server]
     void DeRegisterMe () {
         PlayerManager.instance.DeRegisterPlayer (this);
     }
 
+    [Server]
     IEnumerator InitializePlayer () {
         yield return new WaitForSeconds (1f);
         SetPlaySpawnPos ();
         SetColor ();
     }
 
+    [Client]
     void DeInitializePlayer () {
         if (isLocalPlayer) {
-            DeRegisterMe ();
             DeRegisterInputs();
         }
     }
@@ -181,6 +190,14 @@ public class Player : NetworkBehaviour {
         }
     }
 
+    [ClientRpc]
+    public void ToggleCrosshair () {
+        chInstance.gameObject.SetActive (!chInstance.gameObject.activeSelf);
+        SwapMode (!nonCursor);
+        InputHandler.OnSwapPerformed -= InputHandlerOnOnSwapPerformed;  //turn it off early otherwise can swap back in and break everything
+    }
+    
+
     //Color change logic
     [Server]
     public void SetColor () {
@@ -228,7 +245,7 @@ public class Player : NetworkBehaviour {
 
         if (!isLocalPlayer) return;
         if (UI_Manager.instance) {
-            UI_Manager.instance.ChangeHeartsColor (newColor);
+            HealthManager.instance.ChangeHeartsColor (newColor);
         }
 
     }
@@ -344,6 +361,11 @@ public class Player : NetworkBehaviour {
     
     //Score logic
 
+    [Command]
+    void CmdToggleScoring () {
+        ToggleScoring ();
+    }
+
     [Server]
     void ToggleScoring () {
         isScoring = !isScoring;
@@ -377,17 +399,14 @@ public class Player : NetworkBehaviour {
         }
     }
 
-    [Server]
-    public void UpdateStats () {
-        RpcUpdateStats ();
-    }
-
-    [ClientRpc]
-    void RpcUpdateStats () {
+    [TargetRpc]
+    public void UpdateStats () { //currently not working? users aren't updating their own stats at the end of the game
         if (playerScore < UserProfile.instance.GetCurrentHigh()) { } else {
             UserProfile.instance.SetHigh (playerScore);
+            Debug.Log ($"Updated {gameObject.name}'s highscore ");
         }
     }
+    
 
     //Cooldown based logic including changing fills and calculations
     
@@ -436,37 +455,36 @@ public class Player : NetworkBehaviour {
     }
 
     [Server]
-    public void TweakHealth (bool add, int value) {
-        if (add) {
-            currentHealth = Mathf.Min (currentHealth + value, maxHealth); // Ensure it doesn't exceed max health
-        } else {
-            currentHealth -= value;
-            if (currentHealth <= 0) {
-                currentHealth = 0; // Prevent negative health
-            }
-        }
+    public void TakeDamage () {
+        currentHealth--;
     }
 
     [Client]
     void OnHealthChanged (int oldHealth, int newHealth) {
         if (isLocalPlayer) {
-            UI_Manager.instance.UpdateHealth(false);    
+            if (currentHealth >= 0 && newHealth < oldHealth) {   //SPECIFICALLY LOOK IF HEALTH WAS LOST NOT GAINED SO WHEN CURRENT HEALTH IS SET BACK TO MAX IT DOESN'T REMOVE A HEART
+                HealthManager.instance.RemoveAHeart();
+            }
+            
+            if (currentHealth <= 0) {
+                InputHandler.Disable();
+                CmdChangeCollision();
+                StartCoroutine(WaitBeforeReEnable());
+            } 
         }
-
-        
-        //TODO: Test Collsssion and disable logic
-        if (newHealth <= 0) {
-            InputHandler.Disable();
-            CmdChangeCollision();
-            StartCoroutine(WaitBeforeReEnable());
-        } 
     }
 
 
-    [Client]
-    void Respawn() {
+    //Respawn Logic
+
+    [Command(requiresAuthority = false)]
+    void CmdRespawn() {
+        Respawn ();
+    }
+
+    [Server]
+    void Respawn () {
         currentHealth = maxHealth;
-        UI_Manager.instance.ResetHealth();
     }
     
 
@@ -475,7 +493,8 @@ public class Player : NetworkBehaviour {
         yield return new WaitForSeconds (10);
         InputHandler.Enable ();
         CmdChangeCollision ();
-        Respawn ();
+        CmdRespawn ();
+        HealthManager.instance.ResetHearts();
     }
     
     

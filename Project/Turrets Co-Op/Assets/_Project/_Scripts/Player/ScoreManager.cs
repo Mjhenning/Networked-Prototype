@@ -8,7 +8,7 @@ public class ScoreManager : NetworkBehaviour //don't change ui only change score
 {
     public static ScoreManager instance;
 
-    public bool gameActive = false;
+    [SyncVar]public bool gameActive = false;
 
     
     [SyncVar(hook = nameof(UpdateScoreText))][SerializeField]int score;
