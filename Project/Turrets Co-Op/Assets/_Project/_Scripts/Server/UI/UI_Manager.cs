@@ -31,7 +31,7 @@ public class UI_Manager : MonoBehaviour {
 
 
     [Client]
-    public void ToggleButtonVisibility (Player playerRef) {
+    public void ToggleButtonVisibility (Player playerRef) { //calls togglestartBtn if current player is the first player on the server
 
         Debug.Log ("Toggling button visibility " + "Current player count is " + PlayerManager.instance.playersList.Count);
         
@@ -41,7 +41,7 @@ public class UI_Manager : MonoBehaviour {
     }
 
     [Client]
-    public void ToggleStartBtn () {
+    public void ToggleStartBtn () { //toggles start btn visibility
         Debug.Log ("Toggling Start Btn");
         
         hostStartBtn.SetActive (!hostStartBtn.activeSelf); 
@@ -50,7 +50,7 @@ public class UI_Manager : MonoBehaviour {
 
 
     [Client]
-    public void UpdateBtnText (Player _playerRef) {  //TODO: Rework host button isn't stop hosting
+    public void UpdateBtnText (Player _playerRef) {  //Changes both disconnect btns' text depending on if this is the first player or not
         
         Debug.Log ("Changing disconnect button text " + "Current player index " + PlayerManager.instance.playersList.IndexOf(_playerRef));
 
@@ -119,7 +119,7 @@ public class UI_Manager : MonoBehaviour {
     }
 
     [Client]
-    public void Retry () {
+    public void Retry () { //calls the reload scene command on the serverside game manager when retry btn is pressed
         Game_Manager.instance.CmdReloadOnlineScene ();
     }
 

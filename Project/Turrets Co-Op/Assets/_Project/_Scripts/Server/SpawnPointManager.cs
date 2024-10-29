@@ -13,7 +13,7 @@ public class SpawnPointManager : MonoBehaviour { //script holding a list of spaw
     }
 
     
-    public Transform GetSpawnPoint (int playerIndex) {
+    public Transform GetSpawnPoint (int playerIndex) { //called by player to grab the corresponding spawnpoint off of the list of spawnpoints
         if (playerIndex >= 0 && playerIndex < spawnPoints.Count) {
             return spawnPoints[playerIndex];
         } else {

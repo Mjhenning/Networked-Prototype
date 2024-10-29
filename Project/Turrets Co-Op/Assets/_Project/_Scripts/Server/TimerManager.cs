@@ -23,7 +23,7 @@ public class TimerManager : NetworkBehaviour {
     }
     
     [Server] 
-    public void ToggleTimer() {
+    public void ToggleTimer() { //toggles timer boolean
        timerIsRunning = !timerIsRunning;
     }
    

@@ -22,10 +22,10 @@ public class TerminalPrompts : MonoBehaviour {
 #endif
     }
 
-    void StartServerCommands () {
+    void StartServerCommands () { //start a new thread
         if (!NetworkServer.active) {
             applicationRunning = true;
-            Debug.Log ("Here's a list of usable commands: \n start, used to start the server \n stop, used to stop the server \n exit, used to exit the application");
+            Debug.Log ("Here's a list of usable commands: \n start, used to start the server \n stop, used to stop the server");
 
             // Start a new thread for listening to commands
             Thread commandThread = new Thread (ListenForCommands);
@@ -33,7 +33,7 @@ public class TerminalPrompts : MonoBehaviour {
         }
     }
 
-    void ListenForCommands () {
+    void ListenForCommands () { //listen for console inputs and if inputs is something specific do the corresponding function
         while (applicationRunning) {
             string input = Console.ReadLine ();
 
@@ -53,7 +53,7 @@ public class TerminalPrompts : MonoBehaviour {
         }
     }
 
-    void StartServer () {
+    void StartServer () { //tells networkmanager to stat server
         if (!serverRunning) {
             Debug.Log ("Starting the server...");
             manager.StartServer ();
@@ -63,7 +63,7 @@ public class TerminalPrompts : MonoBehaviour {
         }
     }
 
-    void StopServer () {
+    void StopServer () { //tells networkmanager to stop the server
         if (serverRunning) {
             Debug.Log ("Stopping the server...");
             manager.StopServer ();

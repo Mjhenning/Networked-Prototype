@@ -26,7 +26,7 @@ public class Meteor : NetworkBehaviour {
         }
     }
 
-    void OnCollisionEnter (Collision other) {
+    void OnCollisionEnter (Collision other) { //if collides with player make the player take damage and destroy with ana effect
         if (other.transform.GetComponent<Player>()) {
             Player _player = other.transform.GetComponent<Player> ();
             _player.TakeDamage();
@@ -35,7 +35,7 @@ public class Meteor : NetworkBehaviour {
     }
 
     [Server]
-    void DestroyWEffect () {
+    void DestroyWEffect () { //disables the object and plays an effect
         DisableObj ();
         PlayEffectReturn ();
     }
@@ -43,14 +43,14 @@ public class Meteor : NetworkBehaviour {
     [Server]
     public void Split () {
 
-        if (splitable) {
+        if (splitable) { //if splittable split me and play effect
             splitable = false;
             Meteor[] _children = new Meteor[3];
             DestroyWEffect ();
         
             _children = MeteorPoolManager.Instance.GetMeteorsForSplit (Random.Range (2, 3)); //grab 2/3 meteors from pool
 
-            foreach (var child in _children) {
+            foreach (var child in _children) { //foreach child, set child pos to mine, randomise scale, randomize rotate make me usplitable and enable me
                 if (child != null) {
                     child.transform.position = transform.position;
                     float _randomUScale = Random.Range (.5f,.95f);
@@ -60,14 +60,14 @@ public class Meteor : NetworkBehaviour {
                     child.EnableObj ();
                 }
             }
-        } else {
+        } else { //if not splittable destroy me with an effect
             DestroyWEffect ();
         }
         
     }
 
     [Server]
-    Vector3 PickRandomDirection () {
+    Vector3 PickRandomDirection () { //pick a randomized rotation
         float _randomX = Random.Range (-60f, 60f);
         float _randomY = Random.Range (-60f, 60f);
 
@@ -75,13 +75,13 @@ public class Meteor : NetworkBehaviour {
     }
 
     [Server]
-    void PlayEffectReturn () {
+    void PlayEffectReturn () { // plays effect and syncs to all clients
         effect.gameObject.SetActive (true);
         RpcEnableEffect ();
         StartCoroutine (WaitAndDisable ());
     }
 
-    IEnumerator WaitAndDisable () {
+    IEnumerator WaitAndDisable () { //wait 1.5 seocnds for effect to play then disable effect and return me to pool
         yield return new WaitForSeconds (1.5f);
         effect.gameObject.SetActive (false);
         RpcDisableEffect ();
@@ -99,7 +99,7 @@ public class Meteor : NetworkBehaviour {
     }
 
     [Server]
-    void ReturnMe () {
+    void ReturnMe () { //make me splittable again disable me and tell the pool manager to return me
         splitable = true;
         DisableObj ();
         MeteorPoolManager.Instance.ReturnMeteor (gameObject);

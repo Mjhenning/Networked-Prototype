@@ -89,24 +89,24 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [Server]
-    void HostGameStartChanges (NetworkConnection target, Player _player) {
+    void HostGameStartChanges (NetworkConnection target, Player _player) { //Calls ui changes for the host(first) player
         ToggleClientStart (target, _player);
         UpdateClientBtns (target,_player);
     }
 
     [TargetRpc]
-    void ToggleClientStart (NetworkConnection target, Player _playerRef) {
+    void ToggleClientStart (NetworkConnection target, Player _playerRef) { //toggles start btn vosibility
         UI_Manager.instance.ToggleButtonVisibility(_playerRef);
     }
     
 
     [TargetRpc]
-    void UpdateClientBtns(NetworkConnection target, Player _playerRef) {
+    void UpdateClientBtns(NetworkConnection target, Player _playerRef) { //toggles text of disconnect buttons
         UI_Manager.instance.UpdateBtnText(_playerRef);
     }
     
     [Server]
-    public void TogglePlayerCrosshairs () {
+    public void TogglePlayerCrosshairs () { //toggles player crosshair on or off
         if (isServer) {
             foreach (Player _player in playersList) {
                 _player.ToggleCrosshair ();
@@ -140,20 +140,20 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [Server]
-    void SyncPlayers () {
+    void SyncPlayers () { //synchronizes player color and position after another player leaves
         foreach (Player _player in playersList) {
             _player.SyncMe ();
         }
     }
 
     [Server]
-    void CheckIfSceneShouldRestart () {
+    void CheckIfSceneShouldRestart () { //used to check if server is empty
         if (playersList.Count == 0) {
             StartCoroutine (WaitThenRestart());
         }
     }
 
-    IEnumerator WaitThenRestart () {
+    IEnumerator WaitThenRestart () { //if server is empty wait 2 seconds and restart the scene
         yield return new WaitForSeconds (2f);
         Game_Manager.instance.ReloadOnlineScene ();
     }

@@ -27,14 +27,14 @@ public class HealthManager : MonoBehaviour {
     }
 
     [Client]
-    public void RemoveAHeart() {
+    public void RemoveAHeart() { //removes a heart from the healthbar ui
         hearts[^1].SetActive (false);
         hearts.Remove (hearts[^1]);
         Debug.Log ("Removed a heart");
     }
 
     [Client]
-    public void ResetHearts() {
+    public void ResetHearts() { //resets hearts on healthbar ui
 
         hearts.Clear ();
         
