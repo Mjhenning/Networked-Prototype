@@ -42,13 +42,37 @@ public class UserProfile : MonoBehaviour {
         UserAccManager.instance.GetUserData ("ProfileData");
     }
     
-    void UserDataRetrieved (string key, string value) { //once data is retrieved convert from json to progfiledata class else if nothing retrieved create new profile data and updat player profiledata with empty profiledata
-        if (key == "ProfileData" && value != null) {
-            profileData = JsonUtility.FromJson<ProfileData> (value);
-            OnProfileDataUpdated.Invoke (profileData);
-        } else { //create a new blank profile data that can be edited
-            profileData = new ProfileData ();
-            OnProfileDataUpdated.Invoke (profileData);
+    void UserDataRetrieved(string key, string value)
+    {
+        if (key == "ProfileData" && value != null)
+        {
+            profileData = JsonUtility.FromJson<ProfileData>(value);
+            OnProfileDataUpdated.Invoke(profileData);
+        }
+        else
+        {
+            // Create a new blank profile data and generate a random username
+            profileData = new ProfileData();
+
+            // Call API_Manager to generate a random username
+            API_Manager.instance.UsernameGen(UserAccManager.instance.emailAddress, 5, (generatedUsername) => 
+            {
+                if (!string.IsNullOrEmpty(generatedUsername))
+                {
+                    profileData.name = generatedUsername;
+                    Debug.Log("Generated Username: " + generatedUsername);
+
+                    // Save the new profile data with the generated username
+                    SetUserData(() =>
+                    {
+                        OnProfileDataUpdated.Invoke(profileData); // Notify listeners of the updated profile data
+                    });
+                }
+                else
+                {
+                    Debug.Log("Failed to generate a random username.");
+                }
+            });
         }
     }
     
@@ -77,7 +101,7 @@ public class UserProfile : MonoBehaviour {
         UserAccManager.instance.GetLeaderBoard ("highScore");
     }
     
-    void LeaderboardRetrieved (string key, List<PlayerLeaderboardEntry> leaderboardEntries) { ///leaderboard ahs been retrieved invoke event
+    void LeaderboardRetrieved (string key, List<PlayerLeaderboardEntry> leaderboardEntries) { ///leaderboard has been retrieved invoke event
         if (key == "highScore") {
             OnLeaderBoardHighUpdated.Invoke (leaderboardEntries);
         }

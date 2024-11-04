@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 
 public class Meteor : NetworkBehaviour {
 
-    bool splitable = true;
+    bool splitable;
     [SerializeField] float meteorSpeed = 3;
     Rigidbody rb;
     [SerializeField] MeshRenderer renderer;
@@ -17,7 +17,11 @@ public class Meteor : NetworkBehaviour {
     void Awake() {
         rb = GetComponent<Rigidbody>();
     }
-    
+
+    void OnEnable () {
+        DecideSplitable (50f);
+    }
+
     void FixedUpdate() {
         if (!isServer) return;
         
@@ -56,8 +60,8 @@ public class Meteor : NetworkBehaviour {
                     float _randomUScale = Random.Range (.5f,.95f);
                     child.transform.localScale = new Vector3 (_randomUScale, _randomUScale, _randomUScale);
                     child.transform.Rotate (PickRandomDirection ()); //randomly Rotates Object
-                    child.splitable = false;
                     child.EnableObj ();
+                    child.splitable = false;
                 }
             }
         } else { //if not splittable destroy me with an effect
@@ -100,7 +104,7 @@ public class Meteor : NetworkBehaviour {
 
     [Server]
     void ReturnMe () { //make me splittable again disable me and tell the pool manager to return me
-        splitable = true;
+        DecideSplitable (50f);
         DisableObj ();
         MeteorPoolManager.Instance.ReturnMeteor (gameObject);
     }
@@ -118,6 +122,7 @@ public class Meteor : NetworkBehaviour {
 
     [ClientRpc]
     void RpcEnableObj() {
+        DecideSplitable (50f);
         renderer.enabled = true;
         GetComponent<Collider>().enabled = true;
     }
@@ -137,5 +142,14 @@ public class Meteor : NetworkBehaviour {
     void RpcDisableObj() {
         renderer.enabled = false;
         GetComponent<Collider>().enabled = false;
+    }
+    
+    public void DecideSplitable(float percentage)
+    {
+        if (Random.Range (0f, 100f) < percentage) {
+            splitable = true;
+        } else {
+            splitable = false;
+        }
     }
 }

@@ -41,6 +41,6 @@ public class UICreateAcc : MonoBehaviour {                    //Manager for Crea
     }
 
     public void CreateAccount () {
-        UserAccManager.instance.CreatAccount (username, emailAddress, password);
+        UserAccManager.instance.CreateAccount (username, emailAddress, password);
     }
 }

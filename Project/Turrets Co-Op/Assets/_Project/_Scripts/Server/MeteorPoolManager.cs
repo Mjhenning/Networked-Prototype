@@ -48,6 +48,7 @@ public class MeteorPoolManager : NetworkBehaviour {
         // Dequeue a meteor from the pool or instantiate a new one if the pool is empty
         if (meteorPool.Count > 0) {
             GameObject meteor = meteorPool.Dequeue ();
+            meteor.transform.position = new Vector3 (0, 50, 0);
             meteor.GetComponent<Meteor> ().EnableObj ();
             meteor.transform.position = GetRandomPositionOnWall ();
         } else {
@@ -64,6 +65,7 @@ public class MeteorPoolManager : NetworkBehaviour {
         if (meteorPool.Count > 0) {
             for (int i = 0; i < childAmount; i++) {
                 GameObject meteor = meteorPool.Dequeue ();
+                meteor.transform.position = new Vector3 (0, 50, 0);
                 children[i] = meteor.GetComponent<Meteor> ();
             }
 

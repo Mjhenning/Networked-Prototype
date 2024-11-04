@@ -406,7 +406,6 @@ public class Player : NetworkBehaviour {
             Debug.Log ($"Updated {gameObject.name}'s highscore ");
         }
     }
-    
 
     //Cooldown based logic including changing fills and calculations
     

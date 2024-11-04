@@ -16,25 +16,32 @@ public class UserAccManager : MonoBehaviour { //Overall Playfab Manager
     public static UnityEvent<string, List<PlayerLeaderboardEntry>> OnLeaderBoardRetrieved = new UnityEvent<string, List<PlayerLeaderboardEntry>> ();
 
     public string playfabID;
+    public string emailAddress;
 
-    void Awake () {
+    void Awake()
+    {
         instance = this;
     }
 
-    public void CreatAccount (string username, string emailAdress, string password) { //used to create a new account on playfab
-        PlayFabClientAPI.RegisterPlayFabUser (
-            new RegisterPlayFabUserRequest () {
+    public void CreateAccount(string username, string emailAdress, string password)
+    {
+        emailAddress = emailAdress; // Store the email address
+        PlayFabClientAPI.RegisterPlayFabUser(
+            new RegisterPlayFabUserRequest()
+            {
                 Email = emailAdress,
                 Password = password,
                 Username = username
             },
-            response => {
-                Debug.Log ($"Successful Account Creation: {username}, {emailAdress}");
-                SignIn (username, password);
+            response =>
+            {
+                Debug.Log($"Successful Account Creation: {username}, {emailAdress}");
+                SignIn(username, password);
             },
-            error => {
-                Debug.Log ($"Unsuccessful Account Creation: {username}, {emailAdress} \n {error.ErrorMessage}");
-                OnCreateAccountFailed.Invoke (error.ErrorMessage);
+            error =>
+            {
+                Debug.Log($"Unsuccessful Account Creation: {username}, {emailAdress} \n {error.ErrorMessage}");
+                OnCreateAccountFailed.Invoke(error.ErrorMessage);
             }
         );
     }
