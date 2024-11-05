@@ -95,7 +95,7 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [TargetRpc]
-    void ToggleClientStart (NetworkConnection target, Player _playerRef) { //toggles start btn vosibility
+    void ToggleClientStart (NetworkConnection target, Player _playerRef) { //toggles start btn visibility
         UI_Manager.instance.ToggleButtonVisibility(_playerRef);
     }
     
@@ -155,7 +155,48 @@ public class PlayerManager : NetworkBehaviour
 
     IEnumerator WaitThenRestart () { //if server is empty wait 2 seconds and restart the scene
         yield return new WaitForSeconds (2f);
-        Game_Manager.instance.ReloadOnlineScene ();
+        Game_Manager.instance.ResetOnlineScene  ();
     }
     
+    //WINNER TXT LOGIC
+
+    [Server]
+    public void CheckWhoWon() {
+        if (playersList.Count == 0) return;
+
+        // Assume the first player has the highest score initially
+        Player winningPlayer = playersList[0];
+
+        // Iterate over players to find the highest score
+        foreach (Player _player in playersList) {
+            if (_player.GetScore() > winningPlayer.GetScore()) {
+                winningPlayer = _player;
+            }
+        }
+
+        // Call Rpc to set label with the winning player's color
+        RpcSetLbl(winningPlayer.GetColor());
+    }
+    
+    //winner text
+
+    [ClientRpc]
+    void RpcSetLbl (Color winnerColor) {
+        UI_Manager.instance.SetWinnerLbl(winnerColor);
+    }
+    
+    //Scene restart logic
+    [Server]
+    public void ResetPlayers () {
+        if (playersList.Count > 0) { //if list has players
+            foreach (Player _player in playersList) {
+                _player.ResetMe ();
+            }
+
+            TogglePlayerCrosshairs (); //sets crosshairs active again and allows input for them
+
+            HostGameStartChanges (playersList[0].connectionToClient, playersList[0]); //by default player at top of list is player 1 
+        }
+       
+    }
 }

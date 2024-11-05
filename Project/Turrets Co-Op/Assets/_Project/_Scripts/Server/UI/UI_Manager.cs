@@ -17,8 +17,10 @@ public class UI_Manager : MonoBehaviour {
     [SerializeField] GameObject endScreen;
     [SerializeField] TMP_Text endScoreTxt;
     [SerializeField] TMP_Text personalEndScoreTxt;
+    [SerializeField] GameObject winnerTxt;
 
     [SerializeField] List<Text> dcBtnText = new List<Text> ();
+    [SerializeField] Button DCBtnInGame;
 
     void Awake () {
         instance = this;
@@ -27,6 +29,13 @@ public class UI_Manager : MonoBehaviour {
     [Client]
     void Start() {
         Game_Manager.instance.endGame.AddListener(ToggleGameOver);
+        Game_Manager.instance.resetGame.AddListener (ToggleGameOver);
+    }
+
+    [Client]
+    public void ToggleBtnsInteractivity () {
+        DCBtnInGame.interactable = !DCBtnInGame.interactable;
+        hostStartBtn.GetComponent<Button> ().interactable = !hostStartBtn.GetComponent<Button> ().interactable;
     }
 
 
@@ -44,7 +53,8 @@ public class UI_Manager : MonoBehaviour {
     public void ToggleStartBtn () { //toggles start btn visibility
         Debug.Log ("Toggling Start Btn");
         
-        hostStartBtn.SetActive (!hostStartBtn.activeSelf); 
+        hostStartBtn.SetActive (!hostStartBtn.activeSelf);
+        hostRetryBtn.SetActive (!hostRetryBtn.activeSelf);
     }
 
 
@@ -69,7 +79,7 @@ public class UI_Manager : MonoBehaviour {
     [Client]
     void ToggleGameOver () { //enables game over UI and disable client crosshairs
         endScreen.SetActive (!endScreen.activeSelf);
-        scoreText.gameObject.SetActive (false);
+        scoreText.gameObject.SetActive (!scoreText.gameObject.activeSelf);
     }
     
     [Client]
@@ -91,6 +101,12 @@ public class UI_Manager : MonoBehaviour {
         if (endScoreTxt) {
             endScoreTxt.text = "Overall Score: " + Environment.NewLine + newScore;
         }
+    }
+
+    [Client]
+    public void SetWinnerLbl (Color winnerColor) {
+        winnerTxt.SetActive (true);
+        winnerTxt.GetComponent<TMP_Text> ().color = winnerColor;
     }
 
     [Client]
@@ -120,7 +136,7 @@ public class UI_Manager : MonoBehaviour {
 
     [Client]
     public void Retry () { //calls the reload scene command on the serverside game manager when retry btn is pressed
-        Game_Manager.instance.CmdReloadOnlineScene ();
+        Game_Manager.instance.CmdResetOnlineScene ();
     }
 
 }

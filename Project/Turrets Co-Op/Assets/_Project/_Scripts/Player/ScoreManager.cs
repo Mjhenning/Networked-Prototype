@@ -43,6 +43,11 @@ public class ScoreManager : NetworkBehaviour //don't change ui only change score
             UI_Manager.instance.UpdateScoreText(newScore);
         }
     }
+
+    [Server]
+    public void ResetGameScore () {
+        score = 0;
+    }
     
     
     

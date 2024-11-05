@@ -95,4 +95,12 @@ public class TimerManager : NetworkBehaviour {
         int seconds = Mathf.FloorToInt(time % 60f); // Get the remaining seconds
         return $"{minutes}:{seconds:00}";
     }
+
+    [Server]
+    public void ResetTimer () {
+        timeRemaining = 120f;
+        UpdateText (120f);
+        UpdateColor(new Color(1,1,1,.137f)); //set to semi transparent white
+        gameEnded = false;
+    }
 }

@@ -13,6 +13,7 @@ public class Game_Manager : NetworkBehaviour
 
     public UnityEvent endGame = new UnityEvent();
     public UnityEvent startGame = new UnityEvent();
+    public UnityEvent resetGame = new UnityEvent ();
 
     void Awake()
     {
@@ -24,13 +25,16 @@ public class Game_Manager : NetworkBehaviour
 
         if (ScoreManager.instance != null && isServer) {
             startGame.AddListener(ScoreManager.instance.ToggleScoring);
-            endGame.AddListener(ScoreManager.instance.ToggleScoring);
             
+            resetGame.AddListener(ScoreManager.instance.ToggleScoring);
+            resetGame.AddListener (ScoreManager.instance.ResetGameScore);
         }
 
         if (TimerManager.instance != null && isServer) {
             startGame.AddListener (TimerManager.instance.ToggleTimer);
-            endGame.AddListener (TimerManager.instance.ToggleTimer);
+            
+            resetGame.AddListener (TimerManager.instance.ToggleTimer);
+            resetGame.AddListener (TimerManager.instance.ResetTimer);
         }
 
         if (PlayerManager.instance != null && isServer) {
@@ -38,6 +42,8 @@ public class Game_Manager : NetworkBehaviour
 
             startGame.AddListener (PlayerManager.instance.TogglePlayerCollisions);
             endGame.AddListener (PlayerManager.instance.TogglePlayerCollisions);
+
+            resetGame.AddListener (PlayerManager.instance.ResetPlayers);
         }
         
     }
@@ -50,13 +56,16 @@ public class Game_Manager : NetworkBehaviour
 
         if (ScoreManager.instance != null && isServer) {
             startGame.RemoveListener(ScoreManager.instance.ToggleScoring);
-            endGame.RemoveListener(ScoreManager.instance.ToggleScoring);
+            resetGame.RemoveListener(ScoreManager.instance.ToggleScoring);
             
+            resetGame.RemoveListener (ScoreManager.instance.ResetGameScore);
         }
 
         if (TimerManager.instance != null && isServer) {
             startGame.RemoveListener (TimerManager.instance.ToggleTimer);
-            endGame.RemoveListener (TimerManager.instance.ToggleTimer);
+            resetGame.RemoveListener (TimerManager.instance.ToggleTimer);
+            
+            resetGame.RemoveListener (TimerManager.instance.ResetTimer);
         }
 
         if (PlayerManager.instance != null && isServer) {
@@ -64,6 +73,8 @@ public class Game_Manager : NetworkBehaviour
 
             startGame.RemoveListener (PlayerManager.instance.TogglePlayerCollisions);
             endGame.RemoveListener (PlayerManager.instance.TogglePlayerCollisions);
+            
+            resetGame.RemoveListener (PlayerManager.instance.ResetPlayers);
         }
     }
 
@@ -82,9 +93,9 @@ public class Game_Manager : NetworkBehaviour
     {
         if (isServer) {
             endGame.Invoke();
-            
-            
+
             PlayerManager.instance.TogglePlayerCrosshairs();
+            PlayerManager.instance.CheckWhoWon ();
         
             Debug.Log ("Ending the game Serverside");
         }
@@ -129,14 +140,27 @@ public class Game_Manager : NetworkBehaviour
     //CALL GAME RELOAD
     
     [Command(requiresAuthority = false)]
-    public void CmdReloadOnlineScene () {
-        ReloadOnlineScene ();
+    public void CmdResetOnlineScene () {
+        ResetOnlineScene ();
     }
 
     [Server]
-    public void ReloadOnlineScene () {
-        Debug.Log ("Reloading Scene");
-        NetworkManager.singleton.ServerChangeScene ("Online");
+    public void ResetOnlineScene () { //instead of reloading scene, turn off gameover screen, reset scores.
+        if (isServer) {
+            Debug.Log ("Resetting Scene");
+
+            //end game resets timer and scoring toggle for each player
+
+            resetGame.Invoke ();
+        }
+
+        RpcCallGameReset();
+    }
+
+    [ClientRpc]
+    void RpcCallGameReset() {
+        resetGame.Invoke ();
+        Time.timeScale = 1;
     }
     
 }

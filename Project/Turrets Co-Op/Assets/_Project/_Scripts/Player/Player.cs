@@ -34,11 +34,12 @@ public class Player : NetworkBehaviour {
     
     public override void OnStartClient () {
         Debug.Log ($"[Player{netId}] OnStartClient");
-        DeInitializePlayer ();
+        Time.timeScale = 1;
     }
 
     public override void OnStopClient () {
         Debug.Log ($"[Player{netId}] OnStopClient");
+       
     }
 
     public override void OnStartServer () {
@@ -67,14 +68,9 @@ public class Player : NetworkBehaviour {
 
     public override void OnStopLocalPlayer () {
         Debug.Log ($"[Player{netId}] OnStopLocalPlayer");
+        DeInitializePlayer ();
     }
     
-    
-    // void OnDisable()
-    // {
-    //     DeRegisterMe();
-    //     DeInitializePlayer();
-    // }
     
     void OnDestroy()
     {
@@ -165,7 +161,9 @@ public class Player : NetworkBehaviour {
             Cursor.visible = false;
             nonCursor = !nonCursor;
         }
-        
+
+        UI_Manager.instance.ToggleBtnsInteractivity ();
+
     }
     
     //Crosshair Logic
@@ -191,10 +189,19 @@ public class Player : NetworkBehaviour {
     }
 
     [ClientRpc]
-    public void ToggleCrosshair () {
-        chInstance.gameObject.SetActive (!chInstance.gameObject.activeSelf);
-        SwapMode (!nonCursor);
-        InputHandler.OnSwapPerformed -= InputHandlerOnOnSwapPerformed;  //turn it off early otherwise can swap back in and break everything
+    public void ToggleCrosshair() {
+        bool isActive = chInstance.gameObject.activeSelf; // Check current active state
+        chInstance.gameObject.SetActive(!isActive); // Toggle crosshair visibility
+        SwapMode(!nonCursor);
+
+        // Subscribe or unsubscribe based on the new state
+        if (isActive) {
+            // If it was active before, we unsubscribe to prevent issues
+            InputHandler.OnSwapPerformed -= InputHandlerOnOnSwapPerformed;  
+        } else {
+            // If it was inactive, we subscribe to the event
+            InputHandler.OnSwapPerformed += InputHandlerOnOnSwapPerformed;  
+        }
     }
     
 
@@ -248,6 +255,11 @@ public class Player : NetworkBehaviour {
             HealthManager.instance.ChangeHeartsColor (newColor);
         }
 
+    }
+
+    [Server]
+    public Color GetColor () {
+        return playerColor;
     }
     
     //Player spawn points logic
@@ -360,6 +372,11 @@ public class Player : NetworkBehaviour {
     }
     
     //Score logic
+
+    [Server]
+    public int GetScore () {
+        return playerScore;
+    }
 
     [Command]
     void CmdToggleScoring () {
@@ -503,6 +520,13 @@ public class Player : NetworkBehaviour {
     public void SyncMe () {
         SetPlaySpawnPos ();
         SetColor ();
+    }
+    
+    //Player logic to reset after restart btn press
+
+    public void ResetMe () {
+        Respawn (); //resets health
+        playerScore = 0; //resets score
     }
 
 }
