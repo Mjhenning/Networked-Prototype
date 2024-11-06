@@ -24,7 +24,7 @@ public class Bullet : NetworkBehaviour {
             hit.transform.GetComponent<Meteor> ().Split ();
         }
 
-        PoolManager.Instance.ReturnBullet (gameObject);
+        BulletPoolManager.Instance.ReturnBullet (gameObject);
     }
 
     [Server] //enable obj visually server side

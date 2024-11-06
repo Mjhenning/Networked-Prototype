@@ -352,7 +352,7 @@ public class Player : NetworkBehaviour {
 
     [Command]
     void CmdFireBullet () {
-        Bullet bullet = PoolManager.Instance.GetBullet (playerColor, this); //change it so it returns bullet instead of gameobject
+        Bullet bullet = BulletPoolManager.Instance.GetBullet (playerColor, this); //change it so it returns bullet instead of gameobject
         if (bullet != null) {
             // Set the bullet's position and rotation
             bullet.transform.position = transform.position;
@@ -361,9 +361,15 @@ public class Player : NetworkBehaviour {
             // Notify clients about the initial position and rotation
             bullet.RpcUpdateTransform (bullet.transform.position, bullet.transform.rotation);
 
-            // Ensure the bullet is enabled and starts moving in the correct direction
-            bullet.EnableObj ();
+            StartCoroutine (WaitThenEnable (bullet));
         }
+    }
+
+    IEnumerator WaitThenEnable (Bullet bullet) {
+        yield return 4; //wait 1 frame before enabling
+        
+        // Ensure the bullet is enabled and starts moving in the correct direction
+        bullet.EnableObj ();
     }
     
     //Score logic

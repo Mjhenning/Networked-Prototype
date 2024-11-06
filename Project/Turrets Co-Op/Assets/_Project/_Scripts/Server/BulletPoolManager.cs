@@ -4,9 +4,9 @@ using UnityEngine;
 using Mirror;
 using Unity.Mathematics;
 
-public class PoolManager : NetworkBehaviour
+public class BulletPoolManager : NetworkBehaviour
 {
-    public static PoolManager Instance;
+    public static BulletPoolManager Instance;
     public GameObject poolPref;
     [ShowInInspector] Queue<GameObject> bulletPool = new Queue<GameObject>();
     public int poolSize = 100;
@@ -39,12 +39,14 @@ public class PoolManager : NetworkBehaviour
         {
             GameObject bullet = bulletPool.Dequeue();
             bullet.GetComponent<Bullet> ().SetProperties (color, owner);
+            bullet.GetComponent<Bullet> ().DisableObj ();
             return bullet.GetComponent<Bullet>();
         }
         else
         {
             GameObject bullet = Instantiate(poolPref, gameObject.transform);
             NetworkServer.Spawn(bullet);
+            bullet.GetComponent<Bullet> ().SetProperties (color, owner);
             bullet.GetComponent<Bullet> ().DisableObj ();
             return bullet.GetComponent<Bullet>();
         }

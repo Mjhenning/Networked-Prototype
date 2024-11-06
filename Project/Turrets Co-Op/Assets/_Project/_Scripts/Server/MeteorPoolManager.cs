@@ -10,7 +10,7 @@ public class MeteorPoolManager : NetworkBehaviour {
 
     public GameObject meteorPrefab;
     [ShowInInspector] Queue<GameObject> meteorPool = new Queue<GameObject> ();
-    public int poolSize = 100;
+    public int poolSize = 40;
 
     [Header ("Wall Setup")]
     // Define the plane (wall) dimensions
@@ -53,6 +53,7 @@ public class MeteorPoolManager : NetworkBehaviour {
             meteor.transform.position = GetRandomPositionOnWall ();
         } else {
             GameObject meteor = Instantiate (meteorPrefab, gameObject.transform);
+            meteor.transform.position = new Vector3 (0, 50, 0);
             NetworkServer.Spawn (meteor);
             meteor.transform.position = GetRandomPositionOnWall ();
         }
