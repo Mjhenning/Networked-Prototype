@@ -21,7 +21,13 @@ public class TimerManager : NetworkBehaviour {
     void Awake () {
         if (instance == null) instance = this;
     }
-    
+
+    void Start () {
+        if (!ScoreManager.instance) return;
+        if (!ScoreManager.instance.gameActive) return;
+        if(isClient)SetClientColorOnJoin ();
+    }
+
     [Server] 
     public void ToggleTimer() { //toggles timer boolean
        timerIsRunning = !timerIsRunning;
@@ -76,6 +82,12 @@ public class TimerManager : NetworkBehaviour {
     void UpdateTimerText (string oldText, string newText) { //reflects client side
         if (!UI_Manager.instance) return;
         UI_Manager.instance.UpdateTimerText (newText);
+    }
+
+    [Client]
+    void SetClientColorOnJoin () {
+        UI_Manager.instance.UpdateTimerTextColor (new Color(1,1,1,.137f));
+        Debug.Log ("Set timer color when client joined");
     }
     
     [Server]

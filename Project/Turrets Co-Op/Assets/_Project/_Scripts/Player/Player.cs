@@ -68,7 +68,8 @@ public class Player : NetworkBehaviour {
 
     public override void OnStopLocalPlayer () {
         Debug.Log ($"[Player{netId}] OnStopLocalPlayer");
-        DeInitializePlayer ();
+
+        DeRegisterInputs ();
     }
     
     
@@ -108,16 +109,10 @@ public class Player : NetworkBehaviour {
         SetPlaySpawnPos ();
         SetColor ();
     }
+    
 
     [Client]
-    void DeInitializePlayer () {
-        if (isLocalPlayer) {
-            DeRegisterInputs();
-        }
-    }
-
-    [Client]
-    void DeRegisterInputs () {
+    public void DeRegisterInputs () {
         InputHandler.Disable ();
         InputHandler.OnFireStarted -= InputHandlerOnOnFireStarted;
         InputHandler.OnFireCanceled -= InputHandlerOnOnFireCanceled;

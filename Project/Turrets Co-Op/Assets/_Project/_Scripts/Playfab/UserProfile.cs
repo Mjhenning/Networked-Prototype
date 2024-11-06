@@ -55,7 +55,7 @@ public class UserProfile : MonoBehaviour {
             profileData = new ProfileData();
 
             // Call API_Manager to generate a random username
-            API_Manager.instance.UsernameGen(UserAccManager.instance.emailAddress, 5, (generatedUsername) => 
+            API_Manager.instance.UsernameGen(UserAccManager.instance.emailAddress, 10, (generatedUsername) => 
             {
                 if (!string.IsNullOrEmpty(generatedUsername))
                 {

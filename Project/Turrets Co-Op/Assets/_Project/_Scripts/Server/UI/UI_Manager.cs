@@ -34,6 +34,7 @@ public class UI_Manager : MonoBehaviour {
 
     [Client]
     public void ToggleBtnsInteractivity () {
+        
         DCBtnInGame.interactable = !DCBtnInGame.interactable;
         hostStartBtn.GetComponent<Button> ().interactable = !hostStartBtn.GetComponent<Button> ().interactable;
     }
@@ -128,7 +129,9 @@ public class UI_Manager : MonoBehaviour {
             case NetworkManagerMode.Host:
                 NetworkManager.singleton.StopHost ();
                 break;
-            case NetworkManagerMode.ClientOnly:
+            case NetworkManagerMode.ClientOnly: //deregister player inputs then dc player (NOT THE BEST APPROACH BUT IT WORKS)
+                Player _refPlayer = FindFirstObjectByType (typeof (Player)) as Player;
+                _refPlayer.DeRegisterInputs ();
                 NetworkManager.singleton.StopClient ();
                 break;
         }

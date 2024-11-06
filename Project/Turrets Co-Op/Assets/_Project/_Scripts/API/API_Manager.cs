@@ -11,7 +11,7 @@ public class API_Manager : MonoBehaviour
         instance = this;
     }
     
-    public void UserNameTest(string email,int amountToGen) //example function
+    public void UserNameTest(string email,int amountToGen) //example function (used to check functionality in editor)
     {
 
         UsernameGen(email, amountToGen, (selectedUsername) =>
