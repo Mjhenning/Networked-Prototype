@@ -157,7 +157,7 @@ public class Player : NetworkBehaviour {
             nonCursor = !nonCursor;
         }
 
-        UI_Manager.instance.ToggleBtnsInteractivity ();
+        UI_Manager.instance.ToggleBtnsInteractivity (cursorActive);
 
     }
     

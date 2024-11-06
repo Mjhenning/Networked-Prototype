@@ -33,10 +33,11 @@ public class UI_Manager : MonoBehaviour {
     }
 
     [Client]
-    public void ToggleBtnsInteractivity () {
-        
-        DCBtnInGame.interactable = !DCBtnInGame.interactable;
-        hostStartBtn.GetComponent<Button> ().interactable = !hostStartBtn.GetComponent<Button> ().interactable;
+    public void ToggleBtnsInteractivity(bool? interactable = null) {
+        bool newInteractableState = interactable ?? !DCBtnInGame.interactable;
+
+        DCBtnInGame.interactable = newInteractableState;
+        hostStartBtn.GetComponent<Button>().interactable = newInteractableState;
     }
 
 
@@ -55,6 +56,8 @@ public class UI_Manager : MonoBehaviour {
         Debug.Log ("Toggling Start Btn");
         
         hostStartBtn.SetActive (!hostStartBtn.activeSelf);
+
+        if (TimerManager.instance.gameEnded) return;
         hostRetryBtn.SetActive (!hostRetryBtn.activeSelf);
     }
 

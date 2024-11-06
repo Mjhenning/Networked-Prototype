@@ -119,12 +119,12 @@ public class TimerManager : NetworkBehaviour {
         timeRemaining = 120f;
         UpdateText (120f);
         timerColor = new Color (1, 1, 1, .137f);
-        StartCoroutine (WaitAFrameAnfChangeColor());
+        StartCoroutine (WaitAFrameAndChangeColor());
         
     }
 
-    IEnumerator WaitAFrameAnfChangeColor () {
-        yield return null;
+    IEnumerator WaitAFrameAndChangeColor () {
+        yield return 10;
         UpdateTimerColor(); //set to semi transparent white
     }
 }
