@@ -29,20 +29,20 @@ public class PlayerManager : NetworkBehaviour
             TogglePlayerBtnsNText(playerRef.connectionToClient, playerRef);
         }
     }
-    
+
     [Server]
-    public void DeRegisterPlayer(Player playerRef) {
+    public void DeRegisterPlayer (Player playerRef) {
         // Remove player's score on disconnect
-        playerRef.RemoveScoreOnDisconnect();
+        playerRef.RemoveScoreOnDisconnect ();
 
         // Get the index of the player who is disconnecting
-        int playerIndex = playersList.IndexOf(playerRef);
+        int playerIndex = playersList.IndexOf (playerRef);
 
         // Remove the player from the list
-        playersList.Remove(playerRef);
+        playersList.Remove (playerRef);
 
         // Sync the updated player list across clients
-        SyncPlayers();
+        SyncPlayers ();
 
         // If the disconnecting player is the host (index 0)
         if (playerIndex == 0) {
@@ -51,7 +51,7 @@ public class PlayerManager : NetworkBehaviour
                 Player newHost = playersList[0]; // The new host is the first player in the list
                 if (newHost.connectionToClient != null && !ScoreManager.instance.gameActive) {
                     // Update client buttons for the new host and assign host controls
-                    HostGameStartChanges(newHost.connectionToClient, newHost);
+                    HostGameStartChanges (newHost.connectionToClient, newHost);
                 } else if (newHost.connectionToClient != null) {
                     UpdateClientBtns (newHost.connectionToClient, newHost);
                 }
@@ -61,15 +61,15 @@ public class PlayerManager : NetworkBehaviour
             // Just update client buttons or other relevant UI for the new player
             Player newHost = playersList.Count > playerIndex ? playersList[playerIndex] : null;
             if (newHost != null && newHost.connectionToClient != null) {
-                UpdateClientBtns(newHost.connectionToClient, newHost);
+                UpdateClientBtns (newHost.connectionToClient, newHost);
             }
         }
-
+        
         CheckIfSceneShouldRestart ();
     }
 
-    
-    
+
+
     //TOGGLES BASED ON GAME END / START FOR UI ELEMENTS
 
     [Server]

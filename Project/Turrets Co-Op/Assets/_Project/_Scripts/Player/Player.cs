@@ -187,7 +187,13 @@ public class Player : NetworkBehaviour {
     public void ToggleCrosshair() {
         bool isActive = chInstance.gameObject.activeSelf; // Check current active state
         chInstance.gameObject.SetActive(!isActive); // Toggle crosshair visibility
-        SwapMode(!nonCursor);
+        
+        if (ScoreManager.instance.gameActive) {
+            SwapMode(true);
+        } else {
+            SwapMode(!nonCursor);  
+        }
+        
 
         // Subscribe or unsubscribe based on the new state
         if (isActive) {

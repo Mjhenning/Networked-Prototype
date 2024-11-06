@@ -3,6 +3,7 @@ using System.Collections;
 using Mirror;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UIElements;
 
 public class ScoreManager : NetworkBehaviour //don't change ui only change score
 {

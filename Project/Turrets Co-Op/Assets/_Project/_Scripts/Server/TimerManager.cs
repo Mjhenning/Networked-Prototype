@@ -8,15 +8,14 @@ public class TimerManager : NetworkBehaviour {
     
     [SerializeField] float timeRemaining = 120;
 
-    [SyncVar (hook = nameof (UpdateTimerColor))] [SerializeField]
-    Color timerColor;
+    [SyncVar][SerializeField] Color timerColor = new Color (1, 1, 1, .137f);
 
     [SyncVar (hook = nameof (UpdateTimerText))] [SerializeField]
     string timerText;
 
-    bool timerIsRunning = false;
+    [SyncVar][SerializeField]bool timerIsRunning = false;
 
-    bool gameEnded = false;
+    [SyncVar]public bool gameEnded = false;
 
     void Awake () {
         if (instance == null) instance = this;
@@ -25,14 +24,14 @@ public class TimerManager : NetworkBehaviour {
     void Start () {
         if (!ScoreManager.instance) return;
         if (!ScoreManager.instance.gameActive) return;
-        if(isClient)SetClientColorOnJoin ();
+        if(isClient){SetClientUIOnJoin ();}
     }
 
     [Server] 
     public void ToggleTimer() { //toggles timer boolean
        timerIsRunning = !timerIsRunning;
     }
-   
+    
     void Update() {
         if (!isServer) return;
 
@@ -66,9 +65,11 @@ public class TimerManager : NetworkBehaviour {
             }
             
             if (timeRemaining > 15) {
-                UpdateColor(new Color(1,1,1,.137f)); //set to semi transparent white
+                timerColor = new Color (1, 1, 1, .137f);
+                UpdateTimerColor(); //set to semi transparent white
             } else if (timeRemaining <= 15) {
-                UpdateColor (new Color (1, 0, 0,.137f)); //set to semi transparent red
+                timerColor = new Color (1, 0, 0, .137f);
+                UpdateTimerColor (); //set to semi transparent red
             }
         }
     }
@@ -85,22 +86,23 @@ public class TimerManager : NetworkBehaviour {
     }
 
     [Client]
-    void SetClientColorOnJoin () {
+    void SetClientUIOnJoin () { //sets client text and color on join
         UI_Manager.instance.UpdateTimerTextColor (new Color(1,1,1,.137f));
-        Debug.Log ("Set timer color when client joined");
+        UI_Manager.instance.UpdateTimerText (FormatTime (120f));
+        Debug.Log ("Set timer color and text when client joined");
     }
     
     [Server]
-    void UpdateColor (Color newColor) { //updates timer color
-        timerColor = newColor;
+    void UpdateTimerColor () { //updates timer color
+        RpcUpdateTimerColor ();
     }
 
-    [Client]
-    void UpdateTimerColor (Color oldColor, Color color) { //reflects client side
-        UI_Manager.instance.UpdateTimerTextColor (color);
+    [ClientRpc]
+    void RpcUpdateTimerColor () { //reflects client side
+        UI_Manager.instance.UpdateTimerTextColor (timerColor);
     }
     
-    [Server]
+    
     string FormatTime(float time)
     {
         int minutes = Mathf.FloorToInt(time / 60f); // Get the total minutes
@@ -110,9 +112,19 @@ public class TimerManager : NetworkBehaviour {
 
     [Server]
     public void ResetTimer () {
+
+        timerIsRunning = false;
+        gameEnded = false;
+        
         timeRemaining = 120f;
         UpdateText (120f);
-        UpdateColor(new Color(1,1,1,.137f)); //set to semi transparent white
-        gameEnded = false;
+        timerColor = new Color (1, 1, 1, .137f);
+        StartCoroutine (WaitAFrameAnfChangeColor());
+        
+    }
+
+    IEnumerator WaitAFrameAnfChangeColor () {
+        yield return null;
+        UpdateTimerColor(); //set to semi transparent white
     }
 }

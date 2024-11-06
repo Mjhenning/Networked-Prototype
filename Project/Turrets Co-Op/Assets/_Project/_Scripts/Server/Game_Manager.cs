@@ -26,14 +26,14 @@ public class Game_Manager : NetworkBehaviour
         if (ScoreManager.instance != null && isServer) {
             startGame.AddListener(ScoreManager.instance.ToggleScoring);
             
-            resetGame.AddListener(ScoreManager.instance.ToggleScoring);
+            endGame.AddListener(ScoreManager.instance.ToggleScoring);
             resetGame.AddListener (ScoreManager.instance.ResetGameScore);
         }
 
         if (TimerManager.instance != null && isServer) {
             startGame.AddListener (TimerManager.instance.ToggleTimer);
             
-            resetGame.AddListener (TimerManager.instance.ToggleTimer);
+            endGame.AddListener (TimerManager.instance.ToggleTimer);
             resetGame.AddListener (TimerManager.instance.ResetTimer);
         }
 
@@ -92,9 +92,12 @@ public class Game_Manager : NetworkBehaviour
     public void CallGameEnd()
     {
         if (isServer) {
+            
+            PlayerManager.instance.TogglePlayerCrosshairs();
+            
             endGame.Invoke();
 
-            PlayerManager.instance.TogglePlayerCrosshairs();
+           
             PlayerManager.instance.CheckWhoWon ();
         
             Debug.Log ("Ending the game Serverside");
@@ -146,14 +149,14 @@ public class Game_Manager : NetworkBehaviour
 
     [Server]
     public void ResetOnlineScene () { //instead of reloading scene, turn off gameover screen, reset scores.
-        if (isServer) {
-            Debug.Log ("Resetting Scene");
+        
+        if (!isServer) return;
 
-            //end game resets timer and scoring toggle for each player
-
-            resetGame.Invoke ();
-        }
-
+        //end game resets timer and scoring toggle for each player
+        if (!(ScoreManager.instance.gameActive || TimerManager.instance.gameEnded)) return;
+        Debug.Log ("Resetting Online Scene");
+        resetGame.Invoke ();
+            
         RpcCallGameReset();
     }
 
