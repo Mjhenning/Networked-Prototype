@@ -184,7 +184,7 @@ public class Player : NetworkBehaviour {
     }
 
     [ClientRpc]
-    public void ToggleCrosshair() {
+    public void ToggleCrosshair() { //used to toggle crosshair and swap modes on game end and restart
         bool isActive = chInstance.gameObject.activeSelf; // Check current active state
         chInstance.gameObject.SetActive(!isActive); // Toggle crosshair visibility
         

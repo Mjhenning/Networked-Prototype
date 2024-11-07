@@ -148,7 +148,7 @@ public class Game_Manager : NetworkBehaviour
     }
 
     [Server]
-    public void ResetOnlineScene () { //instead of reloading scene, turn off gameover screen, reset scores.
+    public void ResetOnlineScene () { //Resets the online scene to a state before starting the "run"
         
         if (!isServer) return;
 
@@ -161,7 +161,7 @@ public class Game_Manager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RpcCallGameReset() {
+    void RpcCallGameReset() { //calls resetgame function client side and sets client timescale back to 1
         resetGame.Invoke ();
         Time.timeScale = 1;
     }
